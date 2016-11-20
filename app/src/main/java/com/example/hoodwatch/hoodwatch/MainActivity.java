@@ -123,7 +123,7 @@ public class MainActivity extends Activity {
     public void startGeofenceMonitoring() {
         Geofence gf = new Geofence.Builder()
                 .setRequestId("test")
-                .setCircularRegion(1.290270, 103.851959, 10)
+                .setCircularRegion(1.44309, 103.785581, 10)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                 .setNotificationResponsiveness(1000)

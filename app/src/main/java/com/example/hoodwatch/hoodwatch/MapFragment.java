@@ -45,11 +45,11 @@ public class MapFragment extends Fragment{
             @Override
             public void onMapReady(GoogleMap map) {
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(	1.290270, 103.851959), 20));
+                        new LatLng(	1.44309, 103.785581), 20));
                 Drawable iconDrawable = getResources().getDrawable(R.mipmap.ic_launcher);
-                map.addMarker(new MarkerOptions().position(new LatLng(1.290270, 103.851959)));
+                map.addMarker(new MarkerOptions().position(new LatLng(1.44309, 103.785581)));
                 CircleOptions circleOptions = new CircleOptions()
-                        .center( new LatLng(1.290270, 103.851959) )
+                        .center( new LatLng(1.44309, 103.785581) )
                         .radius(10)
                         .fillColor(0x40ff0000)
                         .strokeColor(Color.TRANSPARENT)
