@@ -40,6 +40,7 @@
             android:name=".MapFragment"
             android:label="@string/title_activity_map_fragment"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <service android:name=".GeofenceService" android:exported="true" android:enabled="true"/>
     </application>
 
 </manifest>

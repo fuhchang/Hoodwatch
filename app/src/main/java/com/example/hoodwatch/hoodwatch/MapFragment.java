@@ -50,7 +50,7 @@ public class MapFragment extends Fragment{
                 map.addMarker(new MarkerOptions().position(new LatLng(1.290270, 103.851959)));
                 CircleOptions circleOptions = new CircleOptions()
                         .center( new LatLng(1.290270, 103.851959) )
-                        .radius( 10)
+                        .radius(10)
                         .fillColor(0x40ff0000)
                         .strokeColor(Color.TRANSPARENT)
                         .strokeWidth(2);
