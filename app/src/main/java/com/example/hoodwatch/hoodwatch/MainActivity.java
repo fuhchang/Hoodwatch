@@ -41,7 +41,11 @@ import static android.content.ContentValues.TAG;
 
 public class MainActivity extends Activity {
     GoogleApiClient googleApiClient = null;
-
+    double rpLat = 1.44309;
+    double rplng = 103.785581;
+    double hmlat=1.370206;
+    double hmlng=103.8344523;
+    Fragment f;
     @Override
     protected void onResume() {
         super.onResume();
@@ -58,6 +62,9 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        f = Fragment.instantiate(this, MapFragment.class.getName());
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.container, f).commit();
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -65,7 +72,22 @@ public class MainActivity extends Activity {
                     @Override
                     public void onConnected(@Nullable Bundle bundle) {
                         Log.d(TAG, "connected to Google api client ");
-                        startGeofenceMonitoring();
+                        if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return;
+                        }
+
+
+                        startLocationMonitoring();
+                        startGeofenceMonitoring(hmlat,hmlng);
+
+
                     }
 
                     @Override
@@ -80,9 +102,7 @@ public class MainActivity extends Activity {
                 }).build();
 
 
-        Fragment f = Fragment.instantiate(this, MapFragment.class.getName());
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.container, f).commit();
+
     }
 
     @Override
@@ -120,12 +140,13 @@ public class MainActivity extends Activity {
 
     }
 
-    public void startGeofenceMonitoring() {
+    public void startGeofenceMonitoring(double lat , double lng) {
         Geofence gf = new Geofence.Builder()
                 .setRequestId("test")
-                .setCircularRegion(1.44309, 103.785581, 10)
+                .setCircularRegion(lat, lng, 100)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT| Geofence.GEOFENCE_TRANSITION_DWELL)
+                .setLoiteringDelay(1000)
                 .setNotificationResponsiveness(1000)
                 .build();
         GeofencingRequest gfRequest = new GeofencingRequest.Builder()
@@ -153,6 +174,7 @@ public class MainActivity extends Activity {
                 public void onResult(@NonNull Status status) {
                     if(status.isSuccess()){
                         Log.d(TAG,"successfully added geofence");
+
                     }else{
                         Log.d(TAG,"failed to add geofence " + status.getStatus());
                     }

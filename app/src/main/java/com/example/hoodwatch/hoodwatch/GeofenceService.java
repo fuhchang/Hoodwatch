@@ -1,9 +1,11 @@
 package com.example.hoodwatch.hoodwatch;
 
+import android.app.AlertDialog;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -14,6 +16,7 @@ import com.google.android.gms.location.GeofencingEvent;
 
 import java.util.List;
 
+import static android.R.id.list;
 import static android.content.ContentValues.TAG;
 
 /**
@@ -27,33 +30,43 @@ public class GeofenceService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        int mNotificationId = 001;
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
+        Log.d("geo fence","loading intent handler");
         if(event.hasError()){
             Log.d(TAG,"Error on intent haha");
         }else{
-
             int transition = event.getGeofenceTransition();
             List<Geofence> geoList = event.getTriggeringGeofences();
-            Geofence gf = geoList.get(0);
-            String requestID = gf.getRequestId();
-            Intent resultIntent = new Intent(this, GeofenceService.class);
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-            stackBuilder.addParentStack(GeofenceService.class);
-            stackBuilder.addNextIntent(resultIntent);
-            PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-            mBuilder.setSmallIcon(R.mipmap.ic_launcher);
-            mBuilder.setContentTitle("Notification about geofence");
+            Geofence geofence = geoList.get(0);
+            String requestID = geofence.getRequestId();
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(this)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle("My Geofence notification");
             if(transition == Geofence.GEOFENCE_TRANSITION_ENTER){
-                Log.d(TAG, "Entering geofence - " + requestID);
-                mBuilder.setContentText("You are entering geofence");
+                mBuilder.setContentText("Entering geofence - " + requestID);
+                Log.d("geo fence", "Entering geofence - " + requestID);
             }else if(transition == Geofence.GEOFENCE_TRANSITION_EXIT){
-                Log.d(TAG, "Exiting geofence - "+ requestID);
-                mBuilder.setContentText("You are exiting geofence");
+                mBuilder.setContentText("Exiting geofence - "+ requestID);
+                Log.d("geo fence", "Exiting geofence - "+ requestID);
+            }else if(transition == Geofence.GEOFENCE_TRANSITION_DWELL){
+                mBuilder.setContentText("current in geofence - "+ requestID);
+                Log.d("geo fence", "current in geofence - "+ requestID);
             }
+            Intent resultIntent = new Intent(this, GeofenceService.class);
+            PendingIntent resultPendingIntent =
+                    PendingIntent.getActivity(
+                            this,
+                            0,
+                            resultIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
             mBuilder.setContentIntent(resultPendingIntent);
-            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(1,mBuilder.build());
+            NotificationManager mNotifyMgr =
+                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+// Builds the notification and issues it.
+            mNotifyMgr.notify(mNotificationId, mBuilder.build());
         }
     }
 }

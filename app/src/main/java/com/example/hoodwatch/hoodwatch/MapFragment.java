@@ -31,12 +31,16 @@ import java.util.ArrayList;
 public class MapFragment extends Fragment{
     private MapView mMap;
     GoogleMap map;
+    double rplat= 1.44309, rplng=103.785581;
+    double hmlat=1.370206, hmlng=103.8344523;
     ArrayList<Geofence> gList = new ArrayList<Geofence>();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO Auto-generated method stub
+
         View rootView = inflater.inflate(R.layout.activity_map_fragment,
                 container, false);
+
         mMap = (MapView) rootView.findViewById(R.id.googleMapView);
         mMap.onCreate(savedInstanceState);
         mMap.onResume();
@@ -44,12 +48,12 @@ public class MapFragment extends Fragment{
         mMap.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap map) {
+
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(	1.44309, 103.785581), 20));
-                Drawable iconDrawable = getResources().getDrawable(R.mipmap.ic_launcher);
-                map.addMarker(new MarkerOptions().position(new LatLng(1.44309, 103.785581)));
+                        new LatLng(	hmlat, hmlng), 100));
+                map.addMarker(new MarkerOptions().position(new LatLng(hmlat, hmlng)));
                 CircleOptions circleOptions = new CircleOptions()
-                        .center( new LatLng(1.44309, 103.785581) )
+                        .center( new LatLng(hmlat, hmlng) )
                         .radius(10)
                         .fillColor(0x40ff0000)
                         .strokeColor(Color.TRANSPARENT)
