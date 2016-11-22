@@ -41,8 +41,8 @@ import static android.content.ContentValues.TAG;
 
 public class MainActivity extends Activity {
     GoogleApiClient googleApiClient = null;
-    double rplat = 1.4432727;
-    double rplng = 103.7840245;
+    double rpLat = 1.44309;
+    double rplng = 103.785581;
     double hmlat=1.370206;
     double hmlng=103.8344523;
     Fragment f;
@@ -80,20 +80,14 @@ public class MainActivity extends Activity {
                             //                                          int[] grantResults)
                             // to handle the case where the user grants the permission. See the documentation
                             // for ActivityCompat#requestPermissions for more details.
-                            boolean permissionGrantedFine = (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
-                            boolean permissionGrantedCoarse = (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
-                            Log.d("Fine permission", String.valueOf(permissionGrantedFine));
-                            Log.d("Coarse permission", String.valueOf(permissionGrantedCoarse));
-                            if(!permissionGrantedFine){
-                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-                            }
-                            if(!permissionGrantedCoarse){
-                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, 200);
-
-                            }
+                            return;
                         }
+
+
                         startLocationMonitoring();
-                        startGeofenceMonitoring(rplat,rplng);
+                        startGeofenceMonitoring(hmlat,hmlng);
+
+
                     }
 
                     @Override
