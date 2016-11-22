@@ -15,7 +15,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -24,16 +27,19 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-public class MapFragment extends Fragment{
+public class MapFragment extends Fragment implements LocationListener{
     private MapView mMap;
     GoogleMap map;
     double rplat= 1.44309, rplng=103.785581;
     double hmlat=1.370206, hmlng=103.8344523;
     ArrayList<Geofence> gList = new ArrayList<Geofence>();
+    GoogleApiClient mGoogleApiClient;
+    MarkerOptions userIndicator;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO Auto-generated method stub
@@ -50,10 +56,11 @@ public class MapFragment extends Fragment{
             public void onMapReady(GoogleMap map) {
 
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(	hmlat, hmlng), 100));
-                map.addMarker(new MarkerOptions().position(new LatLng(hmlat, hmlng)));
+                        new LatLng(	rplat, rplng), 100));
+                userIndicator = new MarkerOptions().position(new LatLng(rplat, rplng));
+                map.addMarker(userIndicator);
                 CircleOptions circleOptions = new CircleOptions()
-                        .center( new LatLng(hmlat, hmlng) )
+                        .center( new LatLng(rplat, rplng) )
                         .radius(10)
                         .fillColor(0x40ff0000)
                         .strokeColor(Color.TRANSPARENT)
@@ -63,6 +70,30 @@ public class MapFragment extends Fragment{
             }
         });
         return rootView;
+    }
+
+    @Override
+    public void onLocationChanged(final Location location) {
+        mMap.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap map) {
+
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(	rplat, rplng), 100));
+
+                userIndicator = new MarkerOptions().position(new LatLng(location.getLatitude(),location.getLongitude()));
+                userIndicator.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher));
+                map.addMarker(userIndicator);
+                CircleOptions circleOptions = new CircleOptions()
+                        .center( new LatLng(location.getLatitude(), location.getLongitude()) )
+                        .radius(10)
+                        .fillColor(0x40ff0000)
+                        .strokeColor(Color.TRANSPARENT)
+                        .strokeWidth(2);
+                map.addCircle(circleOptions);
+                // creategeofences(1.290270,103.851959,new String("st andrew"));
+            }
+        });
     }
 
 /*
