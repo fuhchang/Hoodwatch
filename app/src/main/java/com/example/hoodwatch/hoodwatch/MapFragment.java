@@ -59,6 +59,7 @@ public class MapFragment extends Fragment {
             @Override
             public void onMapReady(GoogleMap map) {
 
+                
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(nyplat, nyplng), 20));
                 map.addMarker(new MarkerOptions().position(new LatLng(nyplat, nyplng)));
