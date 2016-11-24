@@ -48,6 +48,7 @@ public class MainActivity extends Activity {
     double nyplat = 1.3773754 ;
     double nyplng = 103.8485727;
     Fragment f;
+    ArrayList<Geofence> geoList = new ArrayList<Geofence>();
     @Override
     protected void onResume() {
         super.onResume();
@@ -161,36 +162,34 @@ public class MainActivity extends Activity {
     }
 
     public void startGeofenceMonitoring() {
-        Geofence gfnyp = new Geofence.Builder()
-                .setRequestId("test")
+
+        geoList.add(new Geofence.Builder()
+                .setRequestId("nyp")
                 .setCircularRegion(nyplat, nyplng, 100)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT| Geofence.GEOFENCE_TRANSITION_DWELL)
                 .setLoiteringDelay(1000)
                 .setNotificationResponsiveness(1000)
-                .build();
-        Geofence gfnhm= new Geofence.Builder()
-                .setRequestId("test")
+                .build());
+        geoList.add(new Geofence.Builder()
+                .setRequestId("hm")
                 .setCircularRegion(hmlat, hmlng, 100)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT| Geofence.GEOFENCE_TRANSITION_DWELL)
                 .setLoiteringDelay(1000)
                 .setNotificationResponsiveness(1000)
-                .build();
-        Geofence gfrp = new Geofence.Builder()
-                .setRequestId("test")
+                .build());
+        geoList.add(new Geofence.Builder()
+                .setRequestId("rp")
                 .setCircularRegion(rplat, rplng, 100)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT| Geofence.GEOFENCE_TRANSITION_DWELL)
                 .setLoiteringDelay(1000)
                 .setNotificationResponsiveness(1000)
-                .build();
+                .build());
         GeofencingRequest gfRequest = new GeofencingRequest.Builder()
-                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                .addGeofence(gfnyp)
+                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER).addGeofences(geoList)
                 .build();
-        gfRequest.getGeofences().add(gfnhm);
-        gfRequest.getGeofences().add(gfrp);
         Intent intent = new Intent(this, GeofenceService.class);
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
