@@ -41,8 +41,8 @@ import static android.content.ContentValues.TAG;
 
 public class MainActivity extends Activity {
     GoogleApiClient googleApiClient = null;
-    double rplat = 1.44309;
-    double rplng = 103.785581;
+    double rplat = 1.4441461;
+    double rplng = 103.7835478;
     double hmlat=1.370206;
     double hmlng=103.8344523;
     double nyplat = 1.3773754 ;
