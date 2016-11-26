@@ -23,6 +23,7 @@ public class CreateFlareType extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d("well", "light well");
+                intent.putExtra("type", "light");
                 startActivity(intent);
             }
         });
@@ -32,6 +33,7 @@ public class CreateFlareType extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d("well", "mid well");
+                intent.putExtra("type", "mid");
                 startActivity(intent);
             }
         });
@@ -41,6 +43,7 @@ public class CreateFlareType extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d("well", "heavy well");
+                intent.putExtra("type", "heavy");
                 startActivity(intent);
             }
         });
