@@ -168,25 +168,26 @@ public class MainActivity extends Activity {
                 .setCircularRegion(nyplat, nyplng, 100)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT| Geofence.GEOFENCE_TRANSITION_DWELL)
-                .setLoiteringDelay(1000)
-                .setNotificationResponsiveness(1000)
+                .setLoiteringDelay(0)
+                .setNotificationResponsiveness(0)
                 .build());
         geoList.add(new Geofence.Builder()
                 .setRequestId("hm")
                 .setCircularRegion(hmlat, hmlng, 100)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT| Geofence.GEOFENCE_TRANSITION_DWELL)
-                .setLoiteringDelay(1000)
-                .setNotificationResponsiveness(1000)
+                .setLoiteringDelay(0)
+                .setNotificationResponsiveness(0)
                 .build());
         geoList.add(new Geofence.Builder()
                 .setRequestId("rp")
                 .setCircularRegion(rplat, rplng, 100)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT| Geofence.GEOFENCE_TRANSITION_DWELL)
-                .setLoiteringDelay(1000)
-                .setNotificationResponsiveness(1000)
+                .setLoiteringDelay(0)
+                .setNotificationResponsiveness(0)
                 .build());
+
         GeofencingRequest gfRequest = new GeofencingRequest.Builder()
                 .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER).addGeofences(geoList)
                 .build();

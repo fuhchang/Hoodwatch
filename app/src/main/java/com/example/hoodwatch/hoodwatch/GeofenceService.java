@@ -47,12 +47,6 @@ public class GeofenceService extends IntentService {
             if(transition == Geofence.GEOFENCE_TRANSITION_ENTER){
                 mBuilder.setContentText("Entering geofence - " + requestID);
                 Log.d("geo fence", "Entering geofence - " + requestID);
-            }else if(transition == Geofence.GEOFENCE_TRANSITION_EXIT){
-                mBuilder.setContentText("Exiting geofence - "+ requestID);
-                Log.d("geo fence", "Exiting geofence - "+ requestID);
-            }else if(transition == Geofence.GEOFENCE_TRANSITION_DWELL){
-                mBuilder.setContentText("current in geofence - "+ requestID);
-                Log.d("geo fence", "current in geofence - "+ requestID);
             }
             Intent resultIntent = new Intent(this, GeofenceService.class);
             PendingIntent resultPendingIntent =
