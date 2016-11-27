@@ -28,11 +28,11 @@
         android:layout_gravity="top|right"
         app:backgroundTint="@android:color/white" />
 
-    <ScrollView
+   <!-- <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/cardview_dark_background"
-        android:layout_marginTop="50dp">
+        android:layout_marginTop="50dp">-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,7 +40,7 @@
             android:orientation="vertical"
             android:id="@+id/linearLayout"/>
 
-    </ScrollView>
+    <!--</ScrollView>-->
 
 
 </android.support.design.widget.CoordinatorLayout>

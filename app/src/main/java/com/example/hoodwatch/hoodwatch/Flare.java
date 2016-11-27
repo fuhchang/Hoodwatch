@@ -1,7 +1,8 @@
+package com.example.hoodwatch.hoodwatch;
 
 public class Flare {
     private String flareID, imagename,flareText, classification, userName;
-    private long latitude, longtitude;
+    private long latitude, longtitude, time;
 
 
     public Flare(){
@@ -9,15 +10,17 @@ public class Flare {
         imagename = "";
         flareText = "";
         classification = "";
+        userName = "";
         latitude = 0L;
         longtitude = 0L;
+        time = 0L;
     }
 
     public String getFlareID() {
         return flareID;
     }
 
-    public void setFlareID(String flareID) {
+    protected void setFlareID(String flareID) {
         this.flareID = flareID;
     }
 
@@ -25,18 +28,22 @@ public class Flare {
         return imagename;
     }
 
-    public void setImagename(String imagename) {
+    protected void setImagename(String imagename) {
         this.imagename = imagename;
     }
 
-    public String getFlareText() {
+    protected String getFlareText() {
         return flareText;
+    }
+
+    protected void setFlareText(String flareText) {
+        this.flareText = flareText;
     }
 
     public String getClassification() {
         return classification;
     }
-    public void setClassification(String classification){
+    protected void setClassification(String classification){
         this.classification = classification;
     }
 
@@ -44,7 +51,7 @@ public class Flare {
         return userName;
     }
 
-    public void setUserName(String userName) {
+    protected void setUserName(String userName) {
         this.userName = userName;
     }
 
@@ -52,7 +59,7 @@ public class Flare {
         return latitude;
     }
 
-    public void setLatitude(long latitude) {
+    protected void setLatitude(long latitude) {
         this.latitude = latitude;
     }
 
@@ -60,7 +67,15 @@ public class Flare {
         return longtitude;
     }
 
-    public void setLongtitude(long longtitude) {
+    protected void setLongtitude(long longtitude) {
         this.longtitude = longtitude;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    protected void setTime(long time) {
+        this.time = time;
     }
 }
