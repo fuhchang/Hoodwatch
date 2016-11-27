@@ -12,8 +12,8 @@
         android:gravity="center">
         <ImageView
             android:id="@+id/upload"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:src="@mipmap/hazardicon"/>
     </LinearLayout>
@@ -25,16 +25,19 @@
         android:layout_alignParentBottom="true"
         >
         <com.beardedhen.androidbootstrap.BootstrapEditText
-            android:id="@+id/bedit_text_change_theme"
+            android:id="@+id/msg"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:paddingRight="30px"
+            android:inputType="text"
+            android:imeOptions="actionSend"
             app:roundedCorners="true"
             app:bootstrapBrand="primary"
             />
 
         <com.beardedhen.androidbootstrap.BootstrapCircleThumbnail
+            android:id="@+id/thumb"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:src="@mipmap/flare"
