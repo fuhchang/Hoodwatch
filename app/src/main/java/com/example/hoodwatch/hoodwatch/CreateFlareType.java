@@ -22,8 +22,7 @@ public class CreateFlareType extends AppCompatActivity {
         intent = new Intent(this, CreateFlareMain.class);
         intent.putExtra("username",bundle.getString("username"));
         intent.putExtra("maxcount",bundle.getInt("maxcount"));
-        Intent hashmapIntent = getIntent();
-        intent.putExtra("map",hashmapIntent.getSerializableExtra("map"));
+        intent.putExtra("map",getIntent().getSerializableExtra("map"));
         BootstrapWell lightWell = (BootstrapWell) findViewById(R.id.light);
         lightWell.setOnClickListener(new View.OnClickListener() {
             @Override

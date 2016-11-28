@@ -10,7 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
 
-public class Flare implements Parcelable {
+public class Flare implements Serializable {
     private String flareID, imagename,flareText, classification, userName;
     private Double latitude, longtitude;
     private long time;
@@ -104,13 +104,4 @@ public class Flare implements Parcelable {
         return b;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-
-    }
 }

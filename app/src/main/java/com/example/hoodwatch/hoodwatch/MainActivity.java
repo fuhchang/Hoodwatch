@@ -145,7 +145,7 @@ public class MainActivity extends Activity {
                 }else{
                     intent.putExtra("maxcount", maxcount);
                 }
-                intent.putParcelableArrayListExtra("map", allFlares);
+                intent.putExtra("map", allFlares);
                 startActivity(intent);
                 finish();
             }

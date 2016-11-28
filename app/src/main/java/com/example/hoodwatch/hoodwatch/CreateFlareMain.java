@@ -48,10 +48,12 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 import static android.R.attr.bitmap;
@@ -70,6 +72,7 @@ public class CreateFlareMain extends AppCompatActivity {
     int maxcount;
     String username;
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    ArrayList<Flare> list;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -86,6 +89,9 @@ public class CreateFlareMain extends AppCompatActivity {
         maxcount = bundle.getInt("maxcount");
         username = bundle.getString("username");
         imgName = "Image"+ (maxcount+1);
+
+        list = (ArrayList<Flare>) getIntent().getSerializableExtra("map");
+        Log.v("HashMapTest", Integer.toString(list.size()));
         LinearLayout inputLayout = (LinearLayout) findViewById(R.id.input);
         inputLayout.bringToFront();
         EditText txt =(EditText) findViewById(R.id.msg);
