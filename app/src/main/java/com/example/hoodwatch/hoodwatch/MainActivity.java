@@ -1,52 +1,65 @@
 package com.example.hoodwatch.hoodwatch;
 
+
+
+import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.res.AssetManager;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.location.Location;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.style.BackgroundColorSpan;
+import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity {
+import static android.content.ContentValues.TAG;
+
+public class MainActivity extends Activity {
+    GoogleApiClient googleApiClient = null;
+
+    ArrayList<Geofence> geoList = new ArrayList<Geofence>();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        int response = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+        if (response != ConnectionResult.SUCCESS) {
+            Log.d(TAG, "google play not avaliable");
+            GoogleApiAvailability.getInstance().getErrorDialog(this, response, 1).show();
+        } else {
+            Log.d(TAG, "Google Play Service is avaliable");
+        }
+    }
     HashMap<String, Flare> allFlares = new HashMap<String, Flare>();
     private flareAdapter adapter;
     private RecyclerView rv;
@@ -68,18 +81,73 @@ public class MainActivity extends AppCompatActivity {
         rv.setItemAnimator(new DefaultItemAnimator());
         rv.setAdapter(adapter);
         myFab = (FloatingActionButton)findViewById(R.id.addFlare);
+
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+
+                    @Override
+                    public void onConnected(@Nullable Bundle bundle) {
+                        Log.d(TAG, "connected to Google api client ");
+                        boolean check = false;
+                        if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            System.out.println("hello world");
+                            if(ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                                ActivityCompat.requestPermissions(MainActivity.this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},0);
+                                check = true;
+                            }else{
+                                check =false;
+                            }
+                            if(ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                                ActivityCompat.requestPermissions(MainActivity.this,new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},0);
+                                check = true;
+                            }else{
+                                check =false;
+                            }
+
+                            if(check==false){
+                                return;
+                            }
+
+                        }
+
+
+
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int i) {
+                        Log.d(TAG, "suspended connected to Google api client ");
+                    }
+                }).addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Log.d(TAG, "fail tp connect to Google api client - " + connectionResult.getErrorMessage());
+                    }
+                }).build();
+        maxcount = loadCSV();
         myFab.setOnClickListener((new View.OnClickListener(){
             public void onClick(View v){
                 //call activity add flare
-                maxcount = loadCSV();
-                adapter.notifyDataSetChanged();
+                //adapter.notifyDataSetChanged();
                 Intent intent = new Intent(MainActivity.this,CreateFlareType.class);
                 intent.putExtra("username","norman");
+                if(maxcount == 0) {
+                    intent.putExtra("maxcount", 0);
+                }else{
+                    intent.putExtra("maxcount", maxcount);
+                }
                 startActivity(intent);
                 finish();
             }
         }));
-        maxcount = loadCSV();
         adapter.notifyDataSetChanged();
     }
     private int dpToPx(int dp) {
@@ -120,96 +188,26 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    //    private void drawCanvas(){
-//        for(String id:allFlares.keySet()){
-//            if(allFlares.get(id).getImagename()!=""){
-//                drawFlarewithImage(allFlares.get(id));
-//            }
-//            else{
-//                drawFlarewithoutImage(allFlares.get(id));
-//            }
-//        }
-//    }
-//    private  void drawSample(){
-//        View v = getLayoutInflater().inflate(R.layout.row_layout, null);
-//        CardView cv = (CardView)v.findViewById(R.id.flareCards);
-//        TextView tv = (TextView)v.findViewById(R.id.tv_Post);
-//        ImageView iv = (ImageView)v.findViewById(R.id.iv_image);
-//        tv.setText("Hello");
-//        iv.setImageBitmap(loadImageFromStorage("assets/images1", "image1"));
-//        tv.setTextColor(Color.BLACK);
-//        cv.setCardBackgroundColor(Color.WHITE);
-//        cv.addView(tv);
-//        cv.addView(iv);
-//        adapter.notifyDataSetChanged();
-//    }
-//    private void drawFlarewithImage(Flare drawthisflare){
-//        View v = getLayoutInflater().inflate(R.layout.row_layout, null);
-//        CardView cv = (CardView)v.findViewById(R.id.flareCards);
-//        RecyclerView rv = new RecyclerView(this);
-//        TextView tv = (TextView)v.findViewById(R.id.tv_Post);
-//        ImageView iv = (ImageView)v.findViewById(R.id.iv_image);
-//
-//        tv.setText(drawthisflare.getFlareText());
-//        iv.setImageBitmap(loadImageFromStorage(path, drawthisflare.getImagename()));
-//        tv.setTextColor(Color.BLACK);
-//        cv.setCardBackgroundColor(Color.WHITE);
-//        cv.addView(tv);
-//        cv.addView(iv);
-//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 5f);
-//        lp.width=LinearLayout.LayoutParams.MATCH_PARENT;
-//        lp.height= 550;
-//        lp.gravity = Gravity.CENTER;
-//        lp.bottomMargin = 20;
-//        rv.setLayoutParams(lp);
-//        rv.addView(cv);
-//        rv.setOnTouchListener(new OnSwipeTouchListener(this){
-//            public void onSwipeLeft() {
-//                //call show Flare map;
-//            }
-//        });
-//        ll.addView(rv);
-//
-//    }
-//    private  void drawFlarewithoutImage(Flare drawthisflare){
-//        View v = getLayoutInflater().inflate(R.layout.row_layout, null);
-//        CardView cv = (CardView)v.findViewById(R.id.flareCards);
-//        RecyclerView rv = new RecyclerView(this);
-//        TextView tv = (TextView)v.findViewById(R.id.tv_Post);
-//        tv.setText(drawthisflare.getFlareText());
-//        tv.setTextColor(Color.BLACK);
-//        cv.setCardBackgroundColor(Color.WHITE);
-//        cv.addView(tv);
-//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 5f);
-//        lp.width=LinearLayout.LayoutParams.MATCH_PARENT;
-//        lp.height= 550;
-//        lp.gravity = Gravity.CENTER;
-//        lp.bottomMargin = 20;
-//        rv.setLayoutParams(lp);
-//        rv.addView(cv);
-//        rv.setOnTouchListener(new OnSwipeTouchListener(this){
-//            public void onSwipeLeft() {
-//                //call show Flare map;
-//            }
-//        });
-//        ll.addView(rv);
-//
-//    }
     private int loadCSV(){
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(new File("data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/flares.csv")));
+
+            reader = new BufferedReader(new FileReader(new File("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/flares.csv")));
             String csvLine;
             int count=0;
             ArrayList<String[]> allRows = new ArrayList<>();
             while ((csvLine = reader.readLine()) != null) {
+
                 String[] row = csvLine.split(",");
+                Log.d("csv loading", csvLine);
                 allRows.add(count,row);
                 count++;
             }
             for(int i=0 ; i < count; i++){
                 String[] row = allRows.get(i);
                 Flare f = new Flare();
+                Log.d("csv loading", "reading");
+                Log.d("csv loading", row[0]);
                 f.setFlareID(row[0]);
                 f.setImagename(row[1]);
                 f.setFlareText(row[2]);
@@ -219,6 +217,64 @@ public class MainActivity extends AppCompatActivity {
                 f.setLongtitude(Long.parseLong(row[6]));
                 f.setTime(Long.parseLong(row[7]));
                 allFlares.put(row[0], f);
+                Log.d("item",row[0]+ " "+ row[4]);
+                geoList.add(new Geofence.Builder()
+                        .setRequestId(allFlares.get(row[0]).getFlareID())
+                        .setCircularRegion(allFlares.get(row[0]).getLatitude(), allFlares.get(row[0]).getLongtitude(), 100)
+                        .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT| Geofence.GEOFENCE_TRANSITION_DWELL)
+                        .setLoiteringDelay(1000)
+                        .setNotificationResponsiveness(1000)
+                        .build());
+            }
+            GeofencingRequest gfRequest = new GeofencingRequest.Builder()
+                    .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER).addGeofences(geoList)
+                    .build();
+            Intent intent = new Intent(this, GeofenceService.class);
+            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            if (!googleApiClient.isConnected()) {
+                Log.d(TAG, "google api Client is not connected");
+            } else {
+                boolean check = false;
+                if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    System.out.println("hello world");
+                    if(ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                        ActivityCompat.requestPermissions(MainActivity.this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},0);
+                        check = true;
+                    }else{
+                        check =false;
+                    }
+                    if(ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                        ActivityCompat.requestPermissions(MainActivity.this,new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},0);
+                        check = true;
+                    }else{
+                        check =false;
+                    }
+
+                    if(check==false){
+                        Log.d("geofence", "failed to allow geofence");
+                    }
+
+                }
+                LocationServices.GeofencingApi.addGeofences(googleApiClient, gfRequest, pendingIntent).setResultCallback(new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(@NonNull Status status) {
+                        if(status.isSuccess()){
+                            Log.d(TAG,"successfully added geofence");
+
+                        }else{
+                            Log.d(TAG,"failed to add geofence " + status.getStatus());
+                        }
+                    }
+                });
             }
             return count;
         }
@@ -242,5 +298,17 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return b;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        googleApiClient.reconnect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        googleApiClient.disconnect();
     }
 }

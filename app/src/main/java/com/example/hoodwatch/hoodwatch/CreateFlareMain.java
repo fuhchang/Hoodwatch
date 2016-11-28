@@ -66,8 +66,9 @@ public class CreateFlareMain extends AppCompatActivity {
     String imgName;
     EditText txt;
     String type;
-    String name;
     boolean checkImgExit = false;
+    int maxcount;
+    String username;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -82,6 +83,9 @@ public class CreateFlareMain extends AppCompatActivity {
         TypefaceProvider.registerDefaultIconSets();
         Bundle bundle = getIntent().getExtras();
         type = bundle.getString("type");
+        maxcount = bundle.getInt("maxcount");
+        username = bundle.getString("username");
+        imgName = "Image"+ (maxcount+1);
         LinearLayout inputLayout = (LinearLayout) findViewById(R.id.input);
         inputLayout.bringToFront();
         EditText txt =(EditText) findViewById(R.id.msg);
@@ -177,7 +181,6 @@ public class CreateFlareMain extends AppCompatActivity {
             try {
                 imageBitmap = MediaStore.Images.Media.getBitmap(
                         getContentResolver(), imageUri);
-                imgName = "Image";
                 saveToInternalStorage(imageBitmap, imgName);
                 loadImageFromStorage(path);
                 checkImgExit = true;
@@ -265,28 +268,16 @@ public class CreateFlareMain extends AppCompatActivity {
             String fileName = "flares.csv";
             String filePath = dir + File.separator + fileName;
             FileWriter write = new FileWriter(filePath);
-            write.append("\n");
             write.append(imgName);
             write.append(",");
-            if(checkImgExit) {
-                write.append(imgName);
-            }else{
-                write.append("");
-                write.append(",");
-            }
+            write.append(imgName);
+            write.append(",");
            EditText text = (EditText) findViewById(R.id.msg);
-            String check = text.getText().toString();
-            if(check.isEmpty()){
-                write.append("");
-                write.append(",");
-            }else {
-                write.append(",");
-                write.append(text.getText());
-                write.append(",");
-            }
+            write.append(text.getText());
+            write.append(",");
             write.append(type);
             write.append(",");
-            write.append(name);
+            write.append(username);
             write.append(",");
             write.append(Double.toString(lat));
             write.append(",");
@@ -296,6 +287,7 @@ public class CreateFlareMain extends AppCompatActivity {
             Date date = f.parse(f.format(new Date()));
             long millis = date.getTime();
             write.append(Long.toString(millis));
+            write.append("\n");
             write.close();
         } catch (IOException e) {
             e.printStackTrace();
