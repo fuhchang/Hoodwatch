@@ -25,8 +25,10 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
         public TextView tv;
+        public TextView tv2;
         public ImageView iv;
         public CardView cv;
+
 
         public MyViewHolder(View itemView) {
             super(itemView);
