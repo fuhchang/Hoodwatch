@@ -1,5 +1,6 @@
 package com.example.hoodwatch.hoodwatch;
 
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -72,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
                 //call activity add flare
                 maxcount = loadCSV();
                 adapter.notifyDataSetChanged();
+                Intent intent = new Intent(MainActivity.this,CreateFlareType.class);
+                intent.putExtra("username","norman");
+                startActivity(intent);
+                finish();
             }
         }));
         maxcount = loadCSV();
@@ -115,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-//    private void drawCanvas(){
+    //    private void drawCanvas(){
 //        for(String id:allFlares.keySet()){
 //            if(allFlares.get(id).getImagename()!=""){
 //                drawFlarewithImage(allFlares.get(id));
