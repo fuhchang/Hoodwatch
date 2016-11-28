@@ -48,7 +48,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Flare f = allFlares.get(position);
         holder.tv.setText(f.getFlareText());
-        holder.iv.setImageBitmap(f.loadImageFromStorage("data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir", f.getImagename()));
+        holder.iv.setImageBitmap(f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/flares.csv", f.getImagename()));
         holder.cv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

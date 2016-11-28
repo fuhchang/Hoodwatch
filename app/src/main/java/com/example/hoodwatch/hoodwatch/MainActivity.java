@@ -74,14 +74,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         ll= (LinearLayout) findViewById(R.id.linearLayout);
         rv = (RecyclerView) findViewById(R.id.rv_main);
-        adapter = new flareAdapter(this, allFlares);
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
-        rv.setLayoutManager(mLayoutManager);
-        rv.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
-        rv.setItemAnimator(new DefaultItemAnimator());
-        rv.setAdapter(adapter);
-        myFab = (FloatingActionButton)findViewById(R.id.addFlare);
-
+        maxcount = loadCSV();
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -132,7 +125,16 @@ public class MainActivity extends Activity {
                         Log.d(TAG, "fail tp connect to Google api client - " + connectionResult.getErrorMessage());
                     }
                 }).build();
-        maxcount = loadCSV();
+        adapter = new flareAdapter(this, allFlares);
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
+        rv.setLayoutManager(mLayoutManager);
+        rv.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
+        rv.setItemAnimator(new DefaultItemAnimator());
+        rv.setAdapter(adapter);
+        myFab = (FloatingActionButton)findViewById(R.id.addFlare);
+
+
+
         myFab.setOnClickListener((new View.OnClickListener(){
             public void onClick(View v){
                 //call activity add flare
