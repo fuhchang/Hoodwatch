@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:src="@mipmap/hazardicon"/>
+            android:src="@mipmap/file_add"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
