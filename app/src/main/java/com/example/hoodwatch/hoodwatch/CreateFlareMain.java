@@ -91,7 +91,7 @@ public class CreateFlareMain extends AppCompatActivity {
         imgName = "Image"+ (maxcount+1);
 
         list = (ArrayList<Flare>) getIntent().getSerializableExtra("map");
-        Log.v("HashMapTest", Integer.toString(list.size()));
+        Log.v("array size", Integer.toString(list.size()));
         LinearLayout inputLayout = (LinearLayout) findViewById(R.id.input);
         inputLayout.bringToFront();
         EditText txt =(EditText) findViewById(R.id.msg);
@@ -274,6 +274,24 @@ public class CreateFlareMain extends AppCompatActivity {
             String fileName = "flares.csv";
             String filePath = dir + File.separator + fileName;
             FileWriter write = new FileWriter(filePath);
+            for(int i=0;i<list.size();i++){
+                write.append(list.get(i).getFlareID());
+                write.append(",");
+                write.append(list.get(i).getImagename());
+                write.append(",");
+                write.append(list.get(i).getFlareText());
+                write.append(",");
+                write.append(list.get(i).getClassification());
+                write.append(",");
+                write.append(list.get(i).getUserName());
+                write.append(",");
+                write.append(Double.toString(list.get(i).getLatitude()));
+                write.append(",");
+                write.append(Double.toString(list.get(i).getLongtitude()));
+                write.append(",");
+                write.append(Long.toString(list.get(i).getTime()));
+                write.append("\n");
+            }
             write.append(imgName);
             write.append(",");
             write.append(imgName);
