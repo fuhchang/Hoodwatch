@@ -146,6 +146,7 @@ public class MainActivity extends Activity {
                 }else{
                     intent.putExtra("maxcount", maxcount);
                 }
+                intent.putExtra("map", allFlares);
                 startActivity(intent);
                 finish();
             }
@@ -205,6 +206,7 @@ public class MainActivity extends Activity {
                 allRows.add(count,row);
                 count++;
             }
+            reader.close();
             for(int i=0 ; i < count; i++){
                 String[] row = allRows.get(i);
                 Flare f = new Flare();

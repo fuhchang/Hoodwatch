@@ -89,6 +89,9 @@ public class CreateFlareMain extends AppCompatActivity {
         LinearLayout inputLayout = (LinearLayout) findViewById(R.id.input);
         inputLayout.bringToFront();
         EditText txt =(EditText) findViewById(R.id.msg);
+        if (ActivityCompat.checkSelfPermission(CreateFlareMain.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(CreateFlareMain.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
+        }
         im = (ImageView) findViewById(R.id.upload);
         im.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,9 +99,6 @@ public class CreateFlareMain extends AppCompatActivity {
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Images.Media.TITLE, "New Picture");
                 values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
-                if (ActivityCompat.checkSelfPermission(CreateFlareMain.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(CreateFlareMain.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
-                }
                 imageUri = getContentResolver().insert(
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
