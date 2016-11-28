@@ -2,14 +2,18 @@ package com.example.hoodwatch.hoodwatch;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 
-public class Flare {
+public class Flare implements Parcelable {
     private String flareID, imagename,flareText, classification, userName;
-    private long latitude, longtitude, time;
+    private Double latitude, longtitude;
+    private long time;
 
 
     public Flare(){
@@ -18,8 +22,8 @@ public class Flare {
         flareText = "";
         classification = "";
         userName = "";
-        latitude = 0L;
-        longtitude = 0L;
+        latitude = 0.0;
+        longtitude = 0.0;
         time = 0L;
     }
 
@@ -62,19 +66,19 @@ public class Flare {
         this.userName = userName;
     }
 
-    public long getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    protected void setLatitude(long latitude) {
+    protected void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public long getLongtitude() {
+    public Double getLongtitude() {
         return longtitude;
     }
 
-    protected void setLongtitude(long longtitude) {
+    protected void setLongtitude(Double longtitude) {
         this.longtitude = longtitude;
     }
 
@@ -92,13 +96,21 @@ public class Flare {
         try {
             File f=new File(path, imageName);
             b = BitmapFactory.decodeStream(new FileInputStream(f));
-
-
         }
         catch (FileNotFoundException e)
         {
             e.printStackTrace();
         }
         return b;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
     }
 }

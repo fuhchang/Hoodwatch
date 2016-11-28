@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by norman on 28/11/16.
@@ -18,7 +20,7 @@ import java.util.HashMap;
 
 public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder> {
 
-    private HashMap<String, Flare> allFlares = new HashMap<>();
+    private List<Flare> allFlares = new ArrayList<>();
     private Context mContext;
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
@@ -33,7 +35,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             cv = (CardView) itemView.findViewById(R.id.flareCards);
         }
     }
-    public flareAdapter(Context mContext, HashMap<String, Flare> allFlares){
+    public flareAdapter(Context mContext, ArrayList<Flare> allFlares){
         this.mContext = mContext;
         this.allFlares = allFlares;
     }

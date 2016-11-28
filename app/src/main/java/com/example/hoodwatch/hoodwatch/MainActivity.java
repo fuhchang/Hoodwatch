@@ -42,6 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
@@ -60,7 +61,7 @@ public class MainActivity extends Activity {
             Log.d(TAG, "Google Play Service is avaliable");
         }
     }
-    HashMap<String, Flare> allFlares = new HashMap<String, Flare>();
+    ArrayList<Flare> allFlares = new ArrayList<>();
     private flareAdapter adapter;
     private RecyclerView rv;
     LinearLayout ll;
@@ -72,9 +73,16 @@ public class MainActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ll= (LinearLayout) findViewById(R.id.linearLayout);
         rv = (RecyclerView) findViewById(R.id.rv_main);
-        maxcount = loadCSV();
+
+        adapter = new flareAdapter(this, allFlares);
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
+        rv.setLayoutManager(mLayoutManager);
+        rv.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
+        rv.setItemAnimator(new DefaultItemAnimator());
+        rv.setAdapter(adapter);
+        myFab = (FloatingActionButton)findViewById(R.id.addFlare);
+
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -125,16 +133,7 @@ public class MainActivity extends Activity {
                         Log.d(TAG, "fail tp connect to Google api client - " + connectionResult.getErrorMessage());
                     }
                 }).build();
-        adapter = new flareAdapter(this, allFlares);
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
-        rv.setLayoutManager(mLayoutManager);
-        rv.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
-        rv.setItemAnimator(new DefaultItemAnimator());
-        rv.setAdapter(adapter);
-        myFab = (FloatingActionButton)findViewById(R.id.addFlare);
-
-
-
+        maxcount = loadCSV();
         myFab.setOnClickListener((new View.OnClickListener(){
             public void onClick(View v){
                 //call activity add flare
@@ -146,7 +145,7 @@ public class MainActivity extends Activity {
                 }else{
                     intent.putExtra("maxcount", maxcount);
                 }
-                intent.putExtra("map", allFlares);
+                intent.putParcelableArrayListExtra("map", allFlares);
                 startActivity(intent);
                 finish();
             }
@@ -202,7 +201,6 @@ public class MainActivity extends Activity {
             while ((csvLine = reader.readLine()) != null) {
 
                 String[] row = csvLine.split(",");
-                Log.d("csv loading", csvLine);
                 allRows.add(count,row);
                 count++;
             }
@@ -213,18 +211,22 @@ public class MainActivity extends Activity {
                 Log.d("csv loading", "reading");
                 Log.d("csv loading", row[0]);
                 f.setFlareID(row[0]);
+
                 f.setImagename(row[1]);
+
                 f.setFlareText(row[2]);
+
                 f.setClassification(row[3]);
+
                 f.setUserName(row[4]);
-                f.setLatitude(Long.parseLong(row[5]));
-                f.setLongtitude(Long.parseLong(row[6]));
+
+                f.setLatitude(Double.parseDouble(row[5]));
+                f.setLongtitude(Double.parseDouble(row[6]));
                 f.setTime(Long.parseLong(row[7]));
-                allFlares.put(row[0], f);
-                Log.d("item",row[0]+ " "+ row[4]);
+                allFlares.add(f);
                 geoList.add(new Geofence.Builder()
-                        .setRequestId(allFlares.get(row[0]).getFlareID())
-                        .setCircularRegion(allFlares.get(row[0]).getLatitude(), allFlares.get(row[0]).getLongtitude(), 100)
+                        .setRequestId(allFlares.get(i).getFlareID())
+                        .setCircularRegion(allFlares.get(i).getLatitude(), allFlares.get(i).getLongtitude(), 100)
                         .setExpirationDuration(Geofence.NEVER_EXPIRE)
                         .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT| Geofence.GEOFENCE_TRANSITION_DWELL)
                         .setLoiteringDelay(1000)
