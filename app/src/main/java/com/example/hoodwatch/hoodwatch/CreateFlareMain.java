@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Camera;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -27,6 +28,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,7 +91,8 @@ public class CreateFlareMain extends AppCompatActivity {
         maxcount = bundle.getInt("maxcount");
         username = bundle.getString("username");
         imgName = "Image"+ (maxcount+1);
-
+        RelativeLayout rl = (RelativeLayout) findViewById(R.id.activity_create_flare_main);
+        rl.setBackgroundColor(Color.WHITE);
         list = (ArrayList<Flare>) getIntent().getSerializableExtra("map");
         Log.v("array size", Integer.toString(list.size()));
         LinearLayout inputLayout = (LinearLayout) findViewById(R.id.input);
@@ -116,7 +119,8 @@ public class CreateFlareMain extends AppCompatActivity {
                 }
             }
         });
-        BootstrapCircleThumbnail thumb = (BootstrapCircleThumbnail) findViewById(R.id.thumb);
+       // BootstrapCircleThumbnail thumb = (BootstrapCircleThumbnail) findViewById(R.id.thumb);
+        ImageView thumb = (ImageView) findViewById(R.id.thumb);
         thumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,6 +129,7 @@ public class CreateFlareMain extends AppCompatActivity {
             }
         });
         EditText editText = (EditText) findViewById(R.id.msg);
+        editText.setTextColor(Color.BLACK);
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -258,7 +263,6 @@ public class CreateFlareMain extends AppCompatActivity {
         LocationServices.FusedLocationApi.requestLocationUpdates(client, lr, new com.google.android.gms.location.LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Toast.makeText(CreateFlareMain.this,location.getLatitude()+ " " + location.getLongitude(),Toast.LENGTH_SHORT).show();
                 lat = location.getLatitude();
                 lng = location.getLongitude();
             }
@@ -318,6 +322,14 @@ public class CreateFlareMain extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        Intent intent = new Intent(CreateFlareMain.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
         Intent intent = new Intent(CreateFlareMain.this, MainActivity.class);
         startActivity(intent);
         finish();
