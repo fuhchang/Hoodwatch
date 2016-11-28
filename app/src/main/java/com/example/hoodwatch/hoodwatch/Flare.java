@@ -1,5 +1,12 @@
 package com.example.hoodwatch.hoodwatch;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 public class Flare {
     private String flareID, imagename,flareText, classification, userName;
     private long latitude, longtitude, time;
@@ -77,5 +84,21 @@ public class Flare {
 
     protected void setTime(long time) {
         this.time = time;
+    }
+
+    public Bitmap loadImageFromStorage(String path, String imageName)
+    {
+        Bitmap b = null;
+        try {
+            File f=new File(path, imageName);
+            b = BitmapFactory.decodeStream(new FileInputStream(f));
+
+
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        return b;
     }
 }
