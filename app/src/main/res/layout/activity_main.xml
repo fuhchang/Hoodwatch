@@ -8,25 +8,30 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent">
+        android:layout_width="match_parent"
+        >
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
-            android:layout_height="44dp"
+            android:layout_height="60dp"
             android:layout_width="match_parent"
-            android:background="@color/colorPrimaryDark">
+            android:background="@color/colorPrimary"
+            app:subtitle="@string/app_name"
+            app:subtitleTextAppearance="@style/ToolbarSubtitleAppearance">
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
-        app:fabSize="mini"
+        android:layout_marginBottom="15dp"
+        android:layout_marginRight="15dp"
+        app:fabSize="auto"
         app:srcCompat="@android:drawable/ic_input_add"
         android:id="@+id/addFlare"
-        app:layout_anchorGravity="top|center_horizontal"
-        android:layout_gravity="top|right"
-        app:backgroundTint="@android:color/white" />
+        app:layout_anchorGravity="bottom|center_horizontal"
+        android:layout_gravity="bottom|right"
+        app:backgroundTint="@android:color/holo_red_light" />
 
    <!-- <ScrollView
         android:layout_width="match_parent"

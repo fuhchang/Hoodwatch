@@ -39,7 +39,8 @@
     xmlns:cardView="http://schemas.android.com/apk/res-auto"
     android:id="@+id/flareCards"
     android:layout_width="match_parent"
-    android:layout_height="380dp"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="65dp"
     android:layout_margin="8dp">
 
     <RelativeLayout
@@ -52,9 +53,14 @@
             android:layout_height="250dp"
             android:layout_alignParentTop="true"
             android:scaleType="centerCrop" />
-
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/iv_icon"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"/>
         <TextView
-            android:id="@+id/iv_address"
+            android:id="@+id/tv_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/iv_image"
@@ -62,14 +68,13 @@
             android:padding="8dp"
             android:textColor="#222"
             android:textStyle="bold"
-            android:text="hello world lololololololollolololololollol"
             android:textSize="22dp" />
 
         <TextView
             android:id="@+id/tv_Post"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/iv_address"
+            android:layout_below="@+id/tv_address"
             android:maxLines="3"
             android:padding="8dp"
             android:textColor="#666"

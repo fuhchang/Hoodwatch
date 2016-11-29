@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +36,8 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
     private Context mContext;
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
-        public TextView tv;
-        public TextView tv2;
-        public ImageView iv;
+        public TextView tv, tv_add;
+        public ImageView iv, iv_icon;
         public CardView cv;
 
 
@@ -45,6 +46,8 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             tv = (TextView) itemView.findViewById(R.id.tv_Post);
             iv = (ImageView) itemView.findViewById(R.id.iv_image);
             cv = (CardView) itemView.findViewById(R.id.flareCards);
+            tv_add = (TextView) itemView.findViewById(R.id.tv_address);
+            iv_icon = (ImageView) itemView.findViewById(R.id.iv_icon);
             cv.setCardBackgroundColor(Color.WHITE);
         }
     }
@@ -65,33 +68,30 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         holder.tv.setText(f.getFlareText());
         holder.tv.setTextSize(30);
         holder.tv.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
-        boolean as;
+        holder.tv_add.setText(f.getAddress());
         holder.iv.setImageBitmap(f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg"));
         if((f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg") == null)){
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             lp.topMargin = 30;
-
             holder.iv.setLayoutParams(lp);
-
-            as = true;
         }
         else{
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 400);
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 600);
             lp.topMargin = 50;
+
             holder.iv.setLayoutParams(lp);
-            as = false;
         }
-        /*
+
         if(f.getClassification().equals("light")){
-            holder.cv.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorLight));
+            holder.iv_icon.setImageResource(mContext.getResources().getIdentifier("cat1", "mipmap", mContext.getPackageName()));
         }
         else if(f.getClassification().equals("mid")){
-            holder.cv.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorMedium));
+            holder.iv_icon.setImageResource(mContext.getResources().getIdentifier("cat2", "mipmap", mContext.getPackageName()));
         }
         else{
-            holder.cv.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorHeavy));
+            holder.iv_icon.setImageResource(mContext.getResources().getIdentifier("cat3", "mipmap", mContext.getPackageName()));
         }
-        */
+
         holder.cv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

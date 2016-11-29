@@ -11,7 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 
 public class Flare implements Serializable {
-    private String flareID, imagename,flareText, classification, userName;
+    private String flareID, imagename,flareText, classification, userName, address;
     private Double latitude, longtitude;
     private long time;
 
@@ -22,6 +22,7 @@ public class Flare implements Serializable {
         flareText = "";
         classification = "";
         userName = "";
+        address="";
         latitude = 0.0;
         longtitude = 0.0;
         time = 0L;
@@ -108,4 +109,11 @@ public class Flare implements Serializable {
 
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }

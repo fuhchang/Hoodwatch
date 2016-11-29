@@ -184,7 +184,7 @@ public class MainActivity extends Activity {
                 f.setLongtitude(Double.parseDouble(row[6]));
                 f.setTime(Long.parseLong(row[7]));
                 List<android.location.Address> list = geocoder.getFromLocation(f.getLatitude(),f.getLongtitude(),3);
-                Log.d("loc", String.valueOf(list.get(0).getFeatureName()));
+                f.setAddress(String.valueOf(list.get(0).getFeatureName()));
                 allFlares.add(f);
                 geoList.add(new Geofence.Builder()
                         .setRequestId(allFlares.get(i).getFlareID())
