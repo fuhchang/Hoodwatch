@@ -21,11 +21,13 @@ import com.beardedhen.androidbootstrap.TypefaceProvider;
 
 public class openFlare extends AppCompatActivity {
     Intent intent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_open_flare);
         TypefaceProvider.registerDefaultIconSets();
+
         Bundle bundle = getIntent().getExtras();
         String address = bundle.getString("add");
         String text = bundle.getString("post");
@@ -48,7 +50,14 @@ public class openFlare extends AppCompatActivity {
         else{
             iv_icon.setImageResource(this.getResources().getIdentifier("cat3", "mipmap", this.getPackageName()));
         }
-        tv_add.setOnClickListener(new onClickopenFrag(bundle.getLong("lat"), bundle.getLong("long"), this));
+        //tv_add.setOnClickListener(new onClickopenFrag(bundle.getLong("lat"), bundle.getLong("long"), this));
+        tv_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(openFlare.this,MapActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -58,30 +67,4 @@ public class openFlare extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-}
-class onClickopenFrag implements View.OnClickListener
-{
-
-    Flare f;
-    Context mContext;
-    public onClickopenFrag(long latitude, long longtitude, Context mContext) {
-        this.f = f;
-        this.mContext = mContext;
-    }
-
-    @Override
-    public void onClick(View v)
-    {
-
-        Fragment fr = new MapFragment();
-        fr.setArguments(args);
-        FragmentManager fm = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fm.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_place, fr);
-        fragmentTransaction.commit();
-
-    }
-
-
-
 }
