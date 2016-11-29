@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        >
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_height="60dp"
+            android:layout_width="match_parent"
+            android:background="@color/colorPrimary"
+            app:subtitle="@string/app_name"
+            app:subtitleTextAppearance="@style/ToolbarSubtitleAppearance">
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
+    <android.widget.ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:nestedScrollingEnabled="true">
+        android:nestedScrollingEnabled="false"
+        android:layout_marginTop="10dp"
+        >
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="500dp"
@@ -18,7 +40,7 @@
         android:id="@+id/iv_openicon"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/iv_openimage"/>
+        />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -36,7 +58,8 @@
         android:maxLines="3"
         android:padding="8dp"
         android:textColor="#fff"
-        android:textSize="14dp"
+        android:textSize="18dp"
         android:layout_below="@+id/tv_openadd"/>
     </RelativeLayout>
+    </android.widget.ScrollView>
 </LinearLayout>
