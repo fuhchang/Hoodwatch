@@ -9,6 +9,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:id="@+id/AddImg"
         android:gravity="center">
         <ImageView
             android:id="@+id/upload"
@@ -26,22 +27,26 @@
         >
         <com.beardedhen.androidbootstrap.BootstrapEditText
             android:id="@+id/msg"
-            android:layout_width="0dp"
+            android:layout_width="140dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:paddingRight="30px"
+            android:layout_weight="1"
+            android:layout_gravity="bottom|end"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginBottom="15dp"
             android:inputType="text"
             android:imeOptions="actionSend"
             app:roundedCorners="true"
             app:bootstrapBrand="primary"
             />
 
-        <ImageView
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/thumb"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@mipmap/newgun"
-
-            />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:layout_alignParentRight="true"
+            app:srcCompat="@android:drawable/ic_media_play" />
     </LinearLayout>
 </RelativeLayout>
