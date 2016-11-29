@@ -118,7 +118,24 @@ public class MainActivity extends Activity {
 
                         }
 
-
+                        maxcount = loadCSV();
+                        myFab.setOnClickListener((new View.OnClickListener(){
+                            public void onClick(View v){
+                                //call activity add flare
+                                //adapter.notifyDataSetChanged();
+                                Intent intent = new Intent(MainActivity.this,CreateFlareType.class);
+                                intent.putExtra("username","norman");
+                                if(maxcount == 0) {
+                                    intent.putExtra("maxcount", 0);
+                                }else{
+                                    intent.putExtra("maxcount", maxcount);
+                                }
+                                intent.putExtra("map", allFlares);
+                                startActivity(intent);
+                                finish();
+                            }
+                        }));
+                        adapter.notifyDataSetChanged();
 
                     }
 
@@ -131,25 +148,9 @@ public class MainActivity extends Activity {
                     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
                         Log.d(TAG, "fail tp connect to Google api client - " + connectionResult.getErrorMessage());
                     }
+
                 }).build();
-        maxcount = loadCSV();
-        myFab.setOnClickListener((new View.OnClickListener(){
-            public void onClick(View v){
-                //call activity add flare
-                //adapter.notifyDataSetChanged();
-                Intent intent = new Intent(MainActivity.this,CreateFlareType.class);
-                intent.putExtra("username","norman");
-                if(maxcount == 0) {
-                    intent.putExtra("maxcount", 0);
-                }else{
-                    intent.putExtra("maxcount", maxcount);
-                }
-                intent.putExtra("map", allFlares);
-                startActivity(intent);
-                finish();
-            }
-        }));
-        adapter.notifyDataSetChanged();
+
     }
     private int loadCSV(){
         BufferedReader reader = null;
