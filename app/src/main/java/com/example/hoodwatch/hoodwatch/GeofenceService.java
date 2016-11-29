@@ -43,16 +43,10 @@ public class GeofenceService extends IntentService {
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(this)
                             .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentTitle("My Geofence notification");
+                            .setContentTitle("Hazard notification");
             if(transition == Geofence.GEOFENCE_TRANSITION_ENTER){
-                mBuilder.setContentText("Entering geofence - " + requestID);
+                mBuilder.setContentText("Becareful!!! There is a hazard Near you");
                 Log.d("geo fence", "Entering geofence - " + requestID);
-            }else if(transition == Geofence.GEOFENCE_TRANSITION_EXIT){
-                mBuilder.setContentText("Exiting geofence - "+ requestID);
-                Log.d("geo fence", "Exiting geofence - "+ requestID);
-            }else if(transition == Geofence.GEOFENCE_TRANSITION_DWELL){
-                mBuilder.setContentText("current in geofence - "+ requestID);
-                Log.d("geo fence", "current in geofence - "+ requestID);
             }
             Intent resultIntent = new Intent(this, GeofenceService.class);
             PendingIntent resultPendingIntent =
@@ -62,11 +56,15 @@ public class GeofenceService extends IntentService {
                             resultIntent,
                             PendingIntent.FLAG_UPDATE_CURRENT
                     );
+            PendingIntent contentIntent =
+                    PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
             mBuilder.setContentIntent(resultPendingIntent);
+            mBuilder.setContentIntent(contentIntent);
             NotificationManager mNotifyMgr =
                     (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 // Builds the notification and issues it.
             mNotifyMgr.notify(mNotificationId, mBuilder.build());
+
         }
     }
 }
