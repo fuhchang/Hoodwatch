@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:nestedScrollingEnabled="true">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:scaleType="centerCrop"
+        android:id="@+id/iv_openimage"
+        />
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:id="@+id/iv_openicon"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/iv_openimage"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_openadd"
+        android:maxLines="3"
+        android:padding="8dp"
+        android:textColor="#fff"
+        android:textStyle="bold"
+        android:textSize="22dp"
+        android:layout_below="@+id/iv_openimage"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_opentext"
+        android:maxLines="3"
+        android:padding="8dp"
+        android:textColor="#fff"
+        android:textSize="14dp"
+        android:layout_below="@+id/tv_openadd"/>
+    </RelativeLayout>
+</LinearLayout>

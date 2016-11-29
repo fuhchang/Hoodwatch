@@ -76,6 +76,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         holder.tv_add.setText(f.getAddress());
         holder.tv_lat.setText(f.getLatitude().toString());
         holder.tv_long.setText(f.getLongtitude().toString());
+        Log.d("Address: ", f.getAddress());
         holder.iv.setImageBitmap(f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg"));
         if((f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg") == null)){
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -121,7 +122,13 @@ class myOwnClickListener implements View.OnClickListener
     public void onClick(View v)
     {
         Intent intent = new Intent(mContext, openFlare.class);
-        intent.putExtra("flare", f);
+        Log.d("address :", f.getAddress());
+        intent.putExtra("add", f.getAddress());
+        intent.putExtra("post", f.getFlareText());
+        intent.putExtra("imagename", f.getImagename());
+        intent.putExtra("classification", f.getClassification());
+        intent.putExtra("lat", f.getLatitude());
+        intent.putExtra("long", f.getLongtitude());
         mContext.startActivity(intent);
 
     }
