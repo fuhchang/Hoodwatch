@@ -1,6 +1,7 @@
 package com.example.hoodwatch.hoodwatch;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.media.Image;
 import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
@@ -44,6 +45,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             tv = (TextView) itemView.findViewById(R.id.tv_Post);
             iv = (ImageView) itemView.findViewById(R.id.iv_image);
             cv = (CardView) itemView.findViewById(R.id.flareCards);
+            cv.setCardBackgroundColor(Color.WHITE);
         }
     }
     public flareAdapter(Context mContext, ArrayList<Flare> allFlares){
@@ -68,6 +70,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         if((f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg") == null)){
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             lp.topMargin = 30;
+
             holder.iv.setLayoutParams(lp);
 
             as = true;
@@ -78,6 +81,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             holder.iv.setLayoutParams(lp);
             as = false;
         }
+        /*
         if(f.getClassification().equals("light")){
             holder.cv.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorLight));
         }
@@ -87,6 +91,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         else{
             holder.cv.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorHeavy));
         }
+        */
         holder.cv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

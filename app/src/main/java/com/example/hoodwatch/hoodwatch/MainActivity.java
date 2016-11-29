@@ -10,6 +10,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,12 +24,14 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.identity.intents.Address;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
@@ -40,6 +43,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -154,6 +158,7 @@ public class MainActivity extends Activity {
     }
     private int loadCSV(){
         BufferedReader reader = null;
+        Geocoder geocoder = new Geocoder(getBaseContext());
         try {
 
             reader = new BufferedReader(new FileReader(new File("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/flares.csv")));
@@ -178,6 +183,8 @@ public class MainActivity extends Activity {
                 f.setLatitude(Double.parseDouble(row[5]));
                 f.setLongtitude(Double.parseDouble(row[6]));
                 f.setTime(Long.parseLong(row[7]));
+                List<android.location.Address> list = geocoder.getFromLocation(f.getLatitude(),f.getLongtitude(),3);
+                Log.d("loc", String.valueOf(list.get(0).getFeatureName()));
                 allFlares.add(f);
                 geoList.add(new Geofence.Builder()
                         .setRequestId(allFlares.get(i).getFlareID())
