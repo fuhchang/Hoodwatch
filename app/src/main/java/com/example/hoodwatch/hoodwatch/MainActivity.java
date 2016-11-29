@@ -169,18 +169,11 @@ public class MainActivity extends Activity {
             for(int i=0 ; i < count; i++){
                 String[] row = allRows.get(i);
                 Flare f = new Flare();
-                Log.d("csv loading", "reading");
-                Log.d("csv loading", row[0]);
                 f.setFlareID(row[0]);
-
                 f.setImagename(row[1]);
-
                 f.setFlareText(row[2]);
-
                 f.setClassification(row[3]);
-
                 f.setUserName(row[4]);
-
                 f.setLatitude(Double.parseDouble(row[5]));
                 f.setLongtitude(Double.parseDouble(row[6]));
                 f.setTime(Long.parseLong(row[7]));

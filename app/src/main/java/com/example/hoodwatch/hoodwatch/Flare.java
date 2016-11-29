@@ -99,9 +99,13 @@ public class Flare implements Serializable {
         }
         catch (FileNotFoundException e)
         {
-            e.printStackTrace();
+            imagename="";
+            b = null;
         }
-        return b;
+        finally {
+            return b;
+        }
+
     }
 
 }
