@@ -21,7 +21,8 @@ import com.beardedhen.androidbootstrap.TypefaceProvider;
 
 public class openFlare extends AppCompatActivity {
     Intent intent;
-
+    double lat;
+    double lng;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +33,8 @@ public class openFlare extends AppCompatActivity {
         String address = bundle.getString("add");
         String text = bundle.getString("post");
         String imagename = bundle.getString("imagename");
+        lat = bundle.getDouble("lat");
+        lng = bundle.getDouble("long");
         String classification = bundle.getString("classification");
         TextView tv_add = (TextView)findViewById(R.id.tv_openadd);
         TextView tv_post = (TextView)findViewById(R.id.tv_opentext);
@@ -55,6 +58,8 @@ public class openFlare extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(openFlare.this,MapActivity.class);
+                intent.putExtra("lat",lat);
+                intent.putExtra("long",lng);
                 startActivity(intent);
             }
         });
@@ -67,4 +72,6 @@ public class openFlare extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
 }
+
