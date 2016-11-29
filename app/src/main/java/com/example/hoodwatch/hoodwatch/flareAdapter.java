@@ -1,6 +1,7 @@
 package com.example.hoodwatch.hoodwatch;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
 import android.provider.ContactsContract;
@@ -25,6 +26,8 @@ import java.util.ResourceBundle;
 
 import javax.crypto.spec.RC2ParameterSpec;
 
+import static android.support.v4.content.ContextCompat.startActivity;
+
 /**
  * Created by norman on 28/11/16.
  */
@@ -36,7 +39,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
     private Context mContext;
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
-        public TextView tv, tv_add;
+        public TextView tv, tv_add, tv_lat, tv_long;
         public ImageView iv, iv_icon;
         public CardView cv;
 
@@ -48,6 +51,8 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             cv = (CardView) itemView.findViewById(R.id.flareCards);
             tv_add = (TextView) itemView.findViewById(R.id.tv_address);
             iv_icon = (ImageView) itemView.findViewById(R.id.iv_icon);
+            tv_lat = (TextView) itemView.findViewById(R.id.tv_lat);
+            tv_long = (TextView) itemView.findViewById(R.id.tv_long);
             cv.setCardBackgroundColor(Color.WHITE);
         }
     }
@@ -69,6 +74,8 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         holder.tv.setTextSize(30);
         holder.tv.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
         holder.tv_add.setText(f.getAddress());
+        holder.tv_lat.setText(f.getLatitude().toString());
+        holder.tv_long.setText(f.getLongtitude().toString());
         holder.iv.setImageBitmap(f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg"));
         if((f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg") == null)){
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -92,16 +99,33 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             holder.iv_icon.setImageResource(mContext.getResources().getIdentifier("cat3", "mipmap", mContext.getPackageName()));
         }
 
-        holder.cv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
+        holder.cv.setOnClickListener(new myOwnClickListener(f, mContext));
     }
 
     @Override
     public int getItemCount() {
         return allFlares.size();
     }
+}
+class myOwnClickListener implements View.OnClickListener
+{
+
+    Flare f;
+    Context mContext;
+    public myOwnClickListener(Flare f, Context mContext) {
+        this.f = f;
+        this.mContext = mContext;
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        Intent intent = new Intent(mContext, openFlare.class);
+        intent.putExtra("flare", f);
+        mContext.startActivity(intent);
+
+    }
+
+
+
 }
