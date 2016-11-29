@@ -195,6 +195,7 @@ public class CreateFlareMain extends AppCompatActivity {
                 saveToInternalStorage(imageBitmap, imgName);
                 loadImageFromStorage(path);
                 checkImgExit = true;
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
