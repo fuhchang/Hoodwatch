@@ -164,8 +164,9 @@ public class MainActivity extends Activity {
                 count++;
             }
             reader.close();
+            Log.d("count: ", String.valueOf(count));
             for(int i=0 ; i < count; i++){
-                String[] row = allRows.get(i);
+                String[] row = allRows.get(count-(i+1));
                 Flare f = new Flare();
                 f.setFlareID(row[0]);
                 f.setImagename(row[1]);
