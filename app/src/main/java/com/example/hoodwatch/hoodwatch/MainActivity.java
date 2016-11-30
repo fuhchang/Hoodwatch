@@ -164,6 +164,8 @@ public class MainActivity extends Activity {
                 count++;
             }
             reader.close();
+            allFlares.clear();
+            geoList.clear();
             Log.d("count: ", String.valueOf(count));
             for(int i=0 ; i < count; i++){
                 String[] row = allRows.get(count-(i+1));
