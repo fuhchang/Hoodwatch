@@ -55,10 +55,11 @@ public class openFlare extends AppCompatActivity {
             iv_image.setLayoutParams(lp);
             iv_image.setImageBitmap(f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", imagename + ".jpg"));
         }
+        Log.d("class", classification);
         if(classification.equals("light")){
             iv_icon.setImageResource(this.getResources().getIdentifier("cat1", "mipmap", this.getPackageName()));
         }
-        else if(f.getClassification().equals("mid")){
+        else if(classification.equals("mid")){
             iv_icon.setImageResource(this.getResources().getIdentifier("cat2", "mipmap", this.getPackageName()));
         }
         else{
