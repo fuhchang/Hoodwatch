@@ -62,7 +62,7 @@
             app:roundedCorners="true"
             app:bootstrapBrand="primary"
             />
-        
+
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
