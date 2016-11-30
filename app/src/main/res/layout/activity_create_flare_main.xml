@@ -62,15 +62,18 @@
             app:roundedCorners="true"
             app:bootstrapBrand="primary"
             />
-
+        
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/thumb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
+            android:clickable="true"
             android:layout_margin="@dimen/fab_margin"
-            android:layout_alignParentRight="true"
-            app:srcCompat="@android:drawable/ic_media_play" />
+            app:fabSize="auto"
+            app:srcCompat="@android:drawable/ic_input_add"
+            android:id="@+id/thumb"
+            app:layout_anchorGravity="bottom|center_horizontal"
+            android:layout_gravity="bottom|right"
+            app:backgroundTint="@android:color/holo_red_light" />
     </LinearLayout>
 </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>
