@@ -14,7 +14,7 @@ public class Flare implements Serializable {
     private String flareID, imagename,flareText, classification, userName, address;
     private Double latitude, longtitude;
     private long time;
-
+    private String type;
 
     public Flare(){
         flareID = "";
@@ -57,6 +57,14 @@ public class Flare implements Serializable {
     }
     protected void setClassification(String classification){
         this.classification = classification;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getUserName() {

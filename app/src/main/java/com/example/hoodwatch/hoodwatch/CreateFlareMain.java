@@ -41,6 +41,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -75,6 +77,7 @@ public class CreateFlareMain extends AppCompatActivity {
     String username;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     ArrayList<Flare> list;
+    private DatabaseReference mDatabase;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -90,14 +93,19 @@ public class CreateFlareMain extends AppCompatActivity {
         type = bundle.getString("type");
         maxcount = bundle.getInt("maxcount");
         username = bundle.getString("username");
-        imgName = "Image"+ (maxcount+1);
+        imgName = "Image" + (maxcount + 1);
+        // get reference to 'users' node
+
+
+        // store app title to 'app_title' node
+
         RelativeLayout rl = (RelativeLayout) findViewById(R.id.activity_create_flare_main);
         rl.setBackgroundColor(Color.WHITE);
         list = (ArrayList<Flare>) getIntent().getSerializableExtra("map");
         Log.v("array size", Integer.toString(list.size()));
         LinearLayout inputLayout = (LinearLayout) findViewById(R.id.input);
         inputLayout.bringToFront();
-        EditText txt =(EditText) findViewById(R.id.msg);
+        EditText txt = (EditText) findViewById(R.id.msg);
         if (ActivityCompat.checkSelfPermission(CreateFlareMain.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(CreateFlareMain.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
         }
@@ -119,7 +127,7 @@ public class CreateFlareMain extends AppCompatActivity {
                 }
             }
         });
-       // BootstrapCircleThumbnail thumb = (BootstrapCircleThumbnail) findViewById(R.id.thumb);
+        // BootstrapCircleThumbnail thumb = (BootstrapCircleThumbnail) findViewById(R.id.thumb);
         ImageView thumb = (ImageView) findViewById(R.id.thumb);
         thumb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,26 +149,28 @@ public class CreateFlareMain extends AppCompatActivity {
         });
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
+        // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
             @Override
             public void onConnected(@Nullable Bundle bundle) {
                 Log.d("geo", "connected to Google api client ");
                 boolean check = false;
-                if (ActivityCompat.checkSelfPermission(CreateFlareMain.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(CreateFlareMain.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    if(ActivityCompat.checkSelfPermission(CreateFlareMain.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                        ActivityCompat.requestPermissions(CreateFlareMain.this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},0);
+                if (ActivityCompat.checkSelfPermission(CreateFlareMain.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(CreateFlareMain.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(CreateFlareMain.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(CreateFlareMain.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
                         check = true;
-                    }else{
-                        check =false;
+                    } else {
+                        check = false;
                     }
-                    if(ActivityCompat.checkSelfPermission(CreateFlareMain.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                        ActivityCompat.requestPermissions(CreateFlareMain.this,new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},0);
+                    if (ActivityCompat.checkSelfPermission(CreateFlareMain.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(CreateFlareMain.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
                         check = true;
-                    }else{
-                        check =false;
+                    } else {
+                        check = false;
                     }
 
-                    if(check==false){
+                    if (check == false) {
                         return;
                     }
 
@@ -177,7 +187,7 @@ public class CreateFlareMain extends AppCompatActivity {
             public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
                 Log.d("geo", "fail tp connect to Google api client - " + connectionResult.getErrorMessage());
             }
-        }).build();
+        }).addApi(AppIndex.API).build();
 
     }
 
@@ -243,23 +253,31 @@ public class CreateFlareMain extends AppCompatActivity {
 
     }
 
+
     @Override
     public void onStart() {
-        super.onStart();
+        super.onStart();// ATTENTION: This was auto-generated to implement the App Indexing API.
+// See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
         client.reconnect();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
 
     @Override
     public void onStop() {
-        super.onStop();
+        super.onStop();// ATTENTION: This was auto-generated to implement the App Indexing API.
+// See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
     }
 
     private void startLocationMonitoring() {
         Log.d("geo", "startLocation monitoring");
         LocationRequest lr = LocationRequest.create().setInterval(10000).setFastestInterval(5000).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},0);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},0);
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(client, lr, new com.google.android.gms.location.LocationListener() {
             @Override
@@ -272,57 +290,77 @@ public class CreateFlareMain extends AppCompatActivity {
 
     }
 
-    private void createFlare(){
+    private void createFlare() {
+//        try {
+//            String dir = "/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir";
+//            Log.d("file", dir);
+//            String fileName = "flares.csv";
+//            String filePath = dir + File.separator + fileName;
+//            FileWriter write = new FileWriter(filePath);
+//            for(int i=0;i<list.size();i++){
+//                write.append(list.get(i).getFlareID());
+//                write.append(",");
+//                write.append(list.get(i).getImagename());
+//                write.append(",");
+//                write.append(list.get(i).getFlareText());
+//                write.append(",");
+//                write.append(list.get(i).getClassification());
+//                write.append(",");
+//                write.append(list.get(i).getUserName());
+//                write.append(",");
+//                write.append(Double.toString(list.get(i).getLatitude()));
+//                write.append(",");
+//                write.append(Double.toString(list.get(i).getLongtitude()));
+//                write.append(",");
+//                write.append(Long.toString(list.get(i).getTime()));
+//                write.append("\n");
+//            }
+//            write.append(imgName);
+//            write.append(",");
+//            write.append(imgName);
+//            write.append(",");
+//           EditText text = (EditText) findViewById(R.id.msg);
+//            write.append(text.getText());
+//            write.append(",");
+//            write.append(type);
+//            write.append(",");
+//            write.append(username);
+//            write.append(",");
+//            write.append(Double.toString(lat));
+//            write.append(",");
+//            write.append(Double.toString(lng));
+//            write.append(",");
+//            SimpleDateFormat f = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+//            Date date = f.parse(f.format(new Date()));
+//            long millis = date.getTime();
+//            write.append(Long.toString(millis));
+//            write.append("\n");
+//            write.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+        Flare flare = new Flare();
+        flare.setFlareID(imgName);
+        flare.setImagename(imgName);
+        EditText text = (EditText) findViewById(R.id.msg);
+        flare.setFlareText(text.getText().toString());
+        flare.setUserName(username);
+        flare.setLatitude(lat);
+        flare.setLongtitude(lng);
+        SimpleDateFormat f = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+        Date date = null;
         try {
-            String dir = "/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir";
-            Log.d("file", dir);
-            String fileName = "flares.csv";
-            String filePath = dir + File.separator + fileName;
-            FileWriter write = new FileWriter(filePath);
-            for(int i=0;i<list.size();i++){
-                write.append(list.get(i).getFlareID());
-                write.append(",");
-                write.append(list.get(i).getImagename());
-                write.append(",");
-                write.append(list.get(i).getFlareText());
-                write.append(",");
-                write.append(list.get(i).getClassification());
-                write.append(",");
-                write.append(list.get(i).getUserName());
-                write.append(",");
-                write.append(Double.toString(list.get(i).getLatitude()));
-                write.append(",");
-                write.append(Double.toString(list.get(i).getLongtitude()));
-                write.append(",");
-                write.append(Long.toString(list.get(i).getTime()));
-                write.append("\n");
-            }
-            write.append(imgName);
-            write.append(",");
-            write.append(imgName);
-            write.append(",");
-           EditText text = (EditText) findViewById(R.id.msg);
-            write.append(text.getText());
-            write.append(",");
-            write.append(type);
-            write.append(",");
-            write.append(username);
-            write.append(",");
-            write.append(Double.toString(lat));
-            write.append(",");
-            write.append(Double.toString(lng));
-            write.append(",");
-            SimpleDateFormat f = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
-            Date date = f.parse(f.format(new Date()));
+            date = f.parse(f.format(new Date()));
             long millis = date.getTime();
-            write.append(Long.toString(millis));
-            write.append("\n");
-            write.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            flare.setTime(millis);
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        flare.setType(type);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.child("event").child(imgName).setValue(flare);
         Intent intent = new Intent(CreateFlareMain.this, MainActivity.class);
         startActivity(intent);
         finish();
@@ -334,5 +372,21 @@ public class CreateFlareMain extends AppCompatActivity {
         Intent intent = new Intent(CreateFlareMain.this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("CreateFlareMain Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
     }
 }
