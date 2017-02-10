@@ -316,6 +316,7 @@ public class CreateFlareMain extends AppCompatActivity {
             e.printStackTrace();
         }
         flare.setType(type);
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mDatabase.child("event").child(imgName).setValue(flare);
         StorageReference mountainsRef = mStorageRef.child(imgName+".jpg");
