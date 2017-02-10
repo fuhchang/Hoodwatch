@@ -8,13 +8,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Camera;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,9 +26,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.content.pm.Signature;
 import android.widget.Toast;
 
-import com.beardedhen.androidbootstrap.BootstrapCircleThumbnail;
 import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -41,27 +37,24 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-
-import static android.R.attr.bitmap;
-import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
 public class CreateFlareMain extends AppCompatActivity {
     ImageView im;
@@ -75,9 +68,11 @@ public class CreateFlareMain extends AppCompatActivity {
     boolean checkImgExit = false;
     int maxcount;
     String username;
+    Bitmap imageBitmap = null;
+    byte[] imgData;
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    ArrayList<Flare> list;
     private DatabaseReference mDatabase;
+    private StorageReference mStorageRef;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -93,7 +88,9 @@ public class CreateFlareMain extends AppCompatActivity {
         type = bundle.getString("type");
         maxcount = bundle.getInt("maxcount");
         username = bundle.getString("username");
+        System.out.println("count " + maxcount);
         imgName = "Image" + (maxcount + 1);
+        System.out.println("image "+ imgName);
         // get reference to 'users' node
 
 
@@ -101,8 +98,7 @@ public class CreateFlareMain extends AppCompatActivity {
 
         RelativeLayout rl = (RelativeLayout) findViewById(R.id.activity_create_flare_main);
         rl.setBackgroundColor(Color.WHITE);
-        list = (ArrayList<Flare>) getIntent().getSerializableExtra("map");
-        Log.v("array size", Integer.toString(list.size()));
+
         LinearLayout inputLayout = (LinearLayout) findViewById(R.id.input);
         inputLayout.bringToFront();
         EditText txt = (EditText) findViewById(R.id.msg);
@@ -194,16 +190,26 @@ public class CreateFlareMain extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        ByteArrayOutputStream fos = new ByteArrayOutputStream();
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            //Bundle extras = data.getExtras();
-            //Bitmap imageBitmap = (Bitmap) extras.get("data");
-            //im.setImageBitmap(imageBitmap);
-            Bitmap imageBitmap = null;
+
+
             try {
                 imageBitmap = MediaStore.Images.Media.getBitmap(
-                        getContentResolver(), imageUri);
-                saveToInternalStorage(imageBitmap, imgName);
-                loadImageFromStorage(path);
+                        getApplicationContext().getContentResolver(), imageUri);
+                ImageView img = (ImageView) findViewById(R.id.upload);
+                img.setDrawingCacheEnabled(true);
+                img.buildDrawingCache();
+                img.setImageBitmap(imageBitmap);
+                Bitmap bitmap = img.getDrawingCache();
+////                saveToInternalStorage(imageBitmap, imgName);
+////                loadImageFromStorage(path);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                if (fos != null) {
+                    imgData = fos.toByteArray();
+                }
+                mStorageRef = FirebaseStorage.getInstance().getReference();
                 checkImgExit = true;
 
             } catch (IOException e) {
@@ -291,57 +297,8 @@ public class CreateFlareMain extends AppCompatActivity {
     }
 
     private void createFlare() {
-//        try {
-//            String dir = "/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir";
-//            Log.d("file", dir);
-//            String fileName = "flares.csv";
-//            String filePath = dir + File.separator + fileName;
-//            FileWriter write = new FileWriter(filePath);
-//            for(int i=0;i<list.size();i++){
-//                write.append(list.get(i).getFlareID());
-//                write.append(",");
-//                write.append(list.get(i).getImagename());
-//                write.append(",");
-//                write.append(list.get(i).getFlareText());
-//                write.append(",");
-//                write.append(list.get(i).getClassification());
-//                write.append(",");
-//                write.append(list.get(i).getUserName());
-//                write.append(",");
-//                write.append(Double.toString(list.get(i).getLatitude()));
-//                write.append(",");
-//                write.append(Double.toString(list.get(i).getLongtitude()));
-//                write.append(",");
-//                write.append(Long.toString(list.get(i).getTime()));
-//                write.append("\n");
-//            }
-//            write.append(imgName);
-//            write.append(",");
-//            write.append(imgName);
-//            write.append(",");
-//           EditText text = (EditText) findViewById(R.id.msg);
-//            write.append(text.getText());
-//            write.append(",");
-//            write.append(type);
-//            write.append(",");
-//            write.append(username);
-//            write.append(",");
-//            write.append(Double.toString(lat));
-//            write.append(",");
-//            write.append(Double.toString(lng));
-//            write.append(",");
-//            SimpleDateFormat f = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
-//            Date date = f.parse(f.format(new Date()));
-//            long millis = date.getTime();
-//            write.append(Long.toString(millis));
-//            write.append("\n");
-//            write.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
         Flare flare = new Flare();
+        System.out.println("img " + imgName);
         flare.setFlareID(imgName);
         flare.setImagename(imgName);
         EditText text = (EditText) findViewById(R.id.msg);
@@ -361,6 +318,27 @@ public class CreateFlareMain extends AppCompatActivity {
         flare.setType(type);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mDatabase.child("event").child(imgName).setValue(flare);
+        StorageReference mountainsRef = mStorageRef.child(imgName+".jpg");
+        if(imgData != null){
+            Toast.makeText(getApplicationContext(), "not null", Toast.LENGTH_SHORT).show();
+            UploadTask uploadTask = mountainsRef.putBytes(imgData);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle unsuccessful uploads
+                    Toast.makeText(getApplicationContext(),"failed",Toast.LENGTH_LONG).show();
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                    Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_LONG).show();
+                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                }
+            });
+        }else{
+            Toast.makeText(getApplicationContext(), "is null", Toast.LENGTH_SHORT).show();
+        }
         Intent intent = new Intent(CreateFlareMain.this, MainActivity.class);
         startActivity(intent);
         finish();

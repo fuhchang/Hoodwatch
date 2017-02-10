@@ -37,6 +37,12 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -52,7 +58,8 @@ import static android.content.ContentValues.TAG;
 
 public class MainActivity extends Activity {
     GoogleApiClient googleApiClient = null;
-
+    private DatabaseReference mPostReference;
+    int maxSize =0;
     ArrayList<Geofence> geoList = new ArrayList<Geofence>();
     @Override
     protected void onResume() {
@@ -79,6 +86,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         rv = (RecyclerView) findViewById(R.id.rv_main);
         rv.setHasFixedSize(true);
+        mPostReference = FirebaseDatabase.getInstance().getReference();
         adapter = new flareAdapter(this, allFlares);
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 1);
         rv.setLayoutManager(mLayoutManager);
@@ -114,24 +122,44 @@ public class MainActivity extends Activity {
 
                         }
 
-                        maxcount = loadCSV();
-                        myFab.setOnClickListener((new View.OnClickListener(){
-                            public void onClick(View v){
-                                //call activity add flare
-                                //adapter.notifyDataSetChanged();
-                                Intent intent = new Intent(MainActivity.this,CreateFlareType.class);
-                                intent.putExtra("username","norman");
-                                if(maxcount == 0) {
-                                    intent.putExtra("maxcount", 0);
-                                }else{
-                                    intent.putExtra("maxcount", maxcount);
+                        ValueEventListener pl = new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                    maxSize = (int)child.getChildrenCount();
+                                    System.out.println(maxSize);
+                                    for(DataSnapshot children: child.getChildren()){
+                                       Flare flare = children.getValue(Flare.class);
+                                        System.out.println(flare.getImagename());
+                                    }
+
                                 }
-                                intent.putExtra("map", allFlares);
-                                startActivity(intent);
-                                finish();
+                                myFab.setOnClickListener((new View.OnClickListener(){
+                                    public void onClick(View v){
+                                        //call activity add flare
+                                        //adapter.notifyDataSetChanged();
+                                        Intent intent = new Intent(MainActivity.this,CreateFlareType.class);
+                                        intent.putExtra("username","norman");
+
+                                        intent.putExtra("maxcount", maxSize);
+
+                                        intent.putExtra("map", allFlares);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                }));
+                                adapter.notifyDataSetChanged();
                             }
-                        }));
-                        adapter.notifyDataSetChanged();
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        };
+                        mPostReference.addValueEventListener(pl);
+//                        mPostReference.addValueEventListener(postListener);
+//                        maxcount = loadCSV();
+
 
                     }
 
