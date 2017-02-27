@@ -77,8 +77,8 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         holder.tv_lat.setText(f.getLatitude().toString());
         holder.tv_long.setText(f.getLongtitude().toString());
         Log.d("Address: ", f.getAddress());
-        holder.iv.setImageBitmap(f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg"));
-        if((f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg") == null)){
+        holder.iv.setImageBitmap(f.loadImageFromStorage("gs://hoodwatch-d34f2.appspot.com/", f.getImagename()+".jpg"));
+        if((f.loadImageFromStorage("gs://hoodwatch-d34f2.appspot.com/", f.getImagename()+".jpg") == null)){
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             lp.topMargin = 30;
             holder.iv.setLayoutParams(lp);
@@ -90,10 +90,10 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             holder.iv.setLayoutParams(lp);
         }
 
-        if(f.getClassification().equals("light")){
+        if(f.getType().equals("light")){
             holder.iv_icon.setImageResource(mContext.getResources().getIdentifier("cat1", "mipmap", mContext.getPackageName()));
         }
-        else if(f.getClassification().equals("mid")){
+        else if(f.getType().equals("mid")){
             holder.iv_icon.setImageResource(mContext.getResources().getIdentifier("cat2", "mipmap", mContext.getPackageName()));
         }
         else{
