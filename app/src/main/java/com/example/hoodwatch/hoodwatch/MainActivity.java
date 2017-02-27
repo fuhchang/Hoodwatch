@@ -2,16 +2,13 @@ package com.example.hoodwatch.hoodwatch;
 
 
 
+import android.Manifest;
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Rect;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,38 +18,27 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.identity.intents.Address;
 import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.firebase.database.ChildEventListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
@@ -61,6 +47,9 @@ public class MainActivity extends Activity {
     private DatabaseReference mPostReference;
     int maxSize =0;
     ArrayList<Geofence> geoList = new ArrayList<Geofence>();
+    ArrayList<Flare> listofFlares = new ArrayList<>();
+    LocationManager lm;
+    Location location;
     @Override
     protected void onResume() {
         super.onResume();
@@ -79,6 +68,7 @@ public class MainActivity extends Activity {
     int maxcount=0;
     String path = "data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir";
     FloatingActionButton myFab ;
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -87,12 +77,19 @@ public class MainActivity extends Activity {
         rv = (RecyclerView) findViewById(R.id.rv_main);
         rv.setHasFixedSize(true);
         mPostReference = FirebaseDatabase.getInstance().getReference();
-        adapter = new flareAdapter(this, allFlares);
+        adapter = new flareAdapter(this, listofFlares);
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 1);
         rv.setLayoutManager(mLayoutManager);
         rv.setItemAnimator(new DefaultItemAnimator());
         rv.setAdapter(adapter);
         myFab = (FloatingActionButton)findViewById(R.id.addFlare);
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            // do your stuff
+        } else {
+            signInAnonymously();
+        }
+
 
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
@@ -102,15 +99,15 @@ public class MainActivity extends Activity {
                     public void onConnected(@Nullable Bundle bundle) {
                         Log.d(TAG, "connected to Google api client ");
                         boolean check = false;
-                        if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            if(ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                                ActivityCompat.requestPermissions(MainActivity.this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},0);
+                        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                                ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},0);
                                 check = true;
                             }else{
                                 check =false;
                             }
-                            if(ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                                ActivityCompat.requestPermissions(MainActivity.this,new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},0);
+                            if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                                ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},0);
                                 check = true;
                             }else{
                                 check =false;
@@ -121,16 +118,49 @@ public class MainActivity extends Activity {
                             }
 
                         }
+                        location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+                        if (location == null) {
+                            System.out.println("HAHAHA SHIT ASSIGNMENT");
+                        }
+                        lm = (LocationManager)getSystemService(MainActivity.LOCATION_SERVICE);
+                        android.location.LocationListener locationlistener = new android.location.LocationListener() {
+                            @Override
+                            public void onLocationChanged(Location location1) {
+                                location = location1;
+                            }
+
+                            @Override
+                            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+                            }
+
+                            @Override
+                            public void onProviderEnabled(String s) {
+
+                            }
+
+                            @Override
+                            public void onProviderDisabled(String s) {
+
+                            }
+                        };
+
+                        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0, locationlistener);
+                        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                        DatabaseReference myRef = database.child("event/");
 
                         ValueEventListener pl = new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
+                                allFlares.clear();
+                                listofFlares.clear();
                                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                                     maxSize = (int)child.getChildrenCount();
                                     System.out.println(maxSize);
                                     for(DataSnapshot children: child.getChildren()){
                                        Flare flare = children.getValue(Flare.class);
-                                        System.out.println(flare.getImagename());
+
+                                        allFlares.add(flare);
                                     }
 
                                 }
@@ -148,7 +178,11 @@ public class MainActivity extends Activity {
                                         finish();
                                     }
                                 }));
+                                System.out.println("llkskdskd");
+                                changelist();
+
                                 adapter.notifyDataSetChanged();
+
                             }
 
                             @Override
@@ -176,6 +210,67 @@ public class MainActivity extends Activity {
                 }).build();
 
     }
+    private void changelist(){
+        String permission = "android.permission.ACCESS_FINE_LOCATION";
+        int permissionCheck = MainActivity.this.checkCallingOrSelfPermission(permission);
+        Geocoder geocode = new Geocoder(getBaseContext());
+        //Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            System.out.println("ppp");
+            double longitude = location.getLongitude();
+            double latitude = location.getLatitude();
+            Location locationA = new Location("point A");
+            locationA.setLongitude(longitude);
+            locationA.setLatitude(latitude);
+            Location locationB = new Location("point B");
+            for (Flare flare : allFlares) {
+                locationB.setLatitude(flare.getLatitude());
+                locationB.setLongitude(flare.getLongtitude());
+                float distance = locationA.distanceTo(locationB);
+                if (distance < 500) {
+                    listofFlares.add(flare);
+                    System.out.println("distance =" + distance);
+                }
+            }
+
+    }
+    private void signInAnonymously() {
+        mAuth.signInAnonymously().addOnSuccessListener(this, new  OnSuccessListener<AuthResult>() {
+            @Override
+            public void onSuccess(AuthResult authResult) {
+                // do your stuff
+            }
+        })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        Log.e(TAG, "signInAnonymously:FAILURE", exception);
+                    }
+                });
+    }
+
+    public class MyLocationListener implements LocationListener
+    {
+        @Override
+        public void onLocationChanged(Location location) {
+            Location locationB = new Location("point B");
+            locationB.setLatitude(flareObject.getLatitude());
+            locationB.setLongitude(flareObject.getLongtitude());
+            float distance = location.distanceTo(locationB);
+            if(distance < 500){
+                listofFlares.add(flareObject);
+                System.out.println("distance ="+distance);
+            }
+        }
+
+        Flare flareObject;
+        public MyLocationListener(Flare flareObject) {
+            this.flareObject = flareObject;
+        }
+        public MyLocationListener(){
+
+        }
+    }
+    /*
     private int loadCSV(){
         BufferedReader reader = null;
         Geocoder geocoder = new Geocoder(getBaseContext());
@@ -274,7 +369,7 @@ public class MainActivity extends Activity {
         }
         return 0;
     }
-
+*/
     @Override
     protected void onStart() {
         super.onStart();
@@ -286,4 +381,5 @@ public class MainActivity extends Activity {
         super.onStop();
         googleApiClient.disconnect();
     }
+
 }

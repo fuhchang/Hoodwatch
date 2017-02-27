@@ -90,10 +90,10 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             holder.iv.setLayoutParams(lp);
         }
 
-        if(f.getClassification().equals("light")){
+        if(f.getType().equals("light")){
             holder.iv_icon.setImageResource(mContext.getResources().getIdentifier("cat1", "mipmap", mContext.getPackageName()));
         }
-        else if(f.getClassification().equals("mid")){
+        else if(f.getType().equals("mid")){
             holder.iv_icon.setImageResource(mContext.getResources().getIdentifier("cat2", "mipmap", mContext.getPackageName()));
         }
         else{
