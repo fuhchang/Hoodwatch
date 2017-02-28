@@ -47,6 +47,8 @@ import java.util.ArrayList;
 import static android.content.ContentValues.TAG;
 
 public class MainActivity extends Activity {
+    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS= 2;
+    String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     GoogleApiClient googleApiClient = null;
     private DatabaseReference mPostReference;
     int maxSize =0;
@@ -54,6 +56,7 @@ public class MainActivity extends Activity {
     ArrayList<Flare> listofFlares = new ArrayList<>();
     LocationManager lm;
     Location location;
+    boolean permissionsAllowed = false;
     @Override
     protected void onResume() {
         super.onResume();
@@ -93,7 +96,8 @@ public class MainActivity extends Activity {
         } else {
             signInAnonymously();
         }
-
+        Geocoder geocoder = new Geocoder(getBaseContext());
+        geoList.clear();
 
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
@@ -102,57 +106,27 @@ public class MainActivity extends Activity {
                     @Override
                     public void onConnected(@Nullable Bundle bundle) {
                         Log.d(TAG, "connected to Google api client ");
-                        boolean check;
+                        boolean check1;
                         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                             if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                                 ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},0);
-                                check = true;
+                                check1 = true;
                             }else{
-                                check =false;
+                                permissionsAllowed=true;
+                                check1 =false;
                             }
                             if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                                 ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},0);
-                                check = true;
+                                check1 = true;
                             }else{
-                                check =false;
+                                check1 =false;
                             }
 
-                            if(!check){
+                            if(!check1){
                                 return;
                             }
 
                         }
-                        location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-                        if (location == null) {
-                            System.out.println("HAHAHA SHIT ASSIGNMENT");
-                        }
-                        lm = (LocationManager)getSystemService(MainActivity.LOCATION_SERVICE);
-                        android.location.LocationListener locationlistener = new android.location.LocationListener() {
-                            @Override
-                            public void onLocationChanged(Location location1) {
-                                location = location1;
-                            }
-
-                            @Override
-                            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-                            }
-
-                            @Override
-                            public void onProviderEnabled(String s) {
-
-                            }
-
-                            @Override
-                            public void onProviderDisabled(String s) {
-
-                            }
-                        };
-
-                        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0, locationlistener);
-                        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-                        DatabaseReference myRef = database.child("event/");
-
                         ValueEventListener pl = new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -163,11 +137,19 @@ public class MainActivity extends Activity {
                                     System.out.println(maxSize);
                                     for(DataSnapshot children: child.getChildren()){
                                        Flare flare = children.getValue(Flare.class);
-
                                         allFlares.add(flare);
+                                        geoList.add(new Geofence.Builder()
+                                                .setRequestId(flare.getFlareID())
+                                                .setCircularRegion(flare.getLatitude(), flare.getLongtitude(), 100)
+                                                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                                                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT| Geofence.GEOFENCE_TRANSITION_DWELL)
+                                                .setLoiteringDelay(1000)
+                                                .setNotificationResponsiveness(1000)
+                                                .build());
                                     }
 
                                 }
+
                                 myFab.setOnClickListener((new View.OnClickListener(){
                                     public void onClick(View v){
                                         //call activity add flare
@@ -182,9 +164,89 @@ public class MainActivity extends Activity {
                                         finish();
                                     }
                                 }));
-                                System.out.println("llkskdskd");
-                                changelist();
 
+
+                                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                        location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+                                        if (location == null) {
+                                            System.out.println("HAHAHA SHIT ASSIGNMENT");
+                                        }
+                                        lm = (LocationManager) getSystemService(MainActivity.LOCATION_SERVICE);
+                                        android.location.LocationListener locationlistener = new android.location.LocationListener() {
+                                            @Override
+                                            public void onLocationChanged(Location location1) {
+                                                location = location1;
+                                            }
+
+                                            @Override
+                                            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+                                            }
+
+                                            @Override
+                                            public void onProviderEnabled(String s) {
+
+                                            }
+
+                                            @Override
+                                            public void onProviderDisabled(String s) {
+
+                                            }
+                                        };
+                                        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationlistener);
+                                        GeofencingRequest gfRequest = new GeofencingRequest.Builder()
+                                                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER).addGeofences(geoList)
+                                                .build();
+                                        Intent intent = new Intent(MainActivity.this, GeofenceService.class);
+                                        PendingIntent pendingIntent = PendingIntent.getService(MainActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                                        if (!googleApiClient.isConnected()) {
+                                            Log.d(TAG, "google api Client is not connected");
+                                        } else {
+                                            boolean check = false;
+                                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                                // TODO: Consider calling
+                                                //    ActivityCompat#requestPermissions
+                                                // here to request the missing permissions, and then overriding
+                                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                                //                                          int[] grantResults)
+                                                // to handle the case where the user grants the permission. See the documentation
+                                                // for ActivityCompat#requestPermissions for more details.
+                                                System.out.println("hello world");
+                                                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                                                    check = true;
+                                                } else {
+                                                    check = false;
+                                                }
+                                                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+                                                    check = true;
+                                                } else {
+                                                    check = false;
+                                                }
+
+                                                if (check == false) {
+                                                    Log.d("geofence", "failed to allow geofence");
+                                                }
+
+                                            }
+                                            LocationServices.GeofencingApi.addGeofences(googleApiClient, gfRequest, pendingIntent).setResultCallback(new ResultCallback<Status>() {
+                                                @Override
+                                                public void onResult(@NonNull Status status) {
+                                                    if (status.isSuccess()) {
+                                                        Log.d(TAG, "successfully added geofence");
+
+                                                    } else {
+                                                        Log.d(TAG, "failed to add geofence " + status.getStatus());
+                                                    }
+                                                }
+                                            });
+                                        }
+                                        changelist();
+                                        adapter.notifyDataSetChanged();
+
+                                }
                                 adapter.notifyDataSetChanged();
 
                             }
@@ -214,9 +276,9 @@ public class MainActivity extends Activity {
                 }).build();
 
     }
+
     private void changelist(){
-        Geocoder geocoder = new Geocoder(getBaseContext());
-        geoList.clear();
+
         String permission = "android.permission.ACCESS_FINE_LOCATION";
         int permissionCheck = MainActivity.this.checkCallingOrSelfPermission(permission);
         Geocoder geocode = new Geocoder(getBaseContext());
@@ -234,65 +296,10 @@ public class MainActivity extends Activity {
                 float distance = locationA.distanceTo(locationB);
                 if (distance < 500) {
                     listofFlares.add(flare);
-                    geoList.add(new Geofence.Builder()
-                            .setRequestId(flare.getFlareID())
-                            .setCircularRegion(flare.getLatitude(), flare.getLongtitude(), 100)
-                            .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT| Geofence.GEOFENCE_TRANSITION_DWELL)
-                            .setLoiteringDelay(1000)
-                            .setNotificationResponsiveness(1000)
-                            .build());
+
                 }
             }
-        GeofencingRequest gfRequest = new GeofencingRequest.Builder()
-                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER).addGeofences(geoList)
-                .build();
-        Intent intent = new Intent(this, GeofenceService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        if (!googleApiClient.isConnected()) {
-            Log.d(TAG, "google api Client is not connected");
-        } else {
-            boolean check = false;
-            if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                System.out.println("hello world");
-                if(ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},0);
-                    check = true;
-                }else{
-                    check =false;
-                }
-                if(ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},0);
-                    check = true;
-                }else{
-                    check =false;
-                }
-
-                if(check==false){
-                    Log.d("geofence", "failed to allow geofence");
-                }
-
-            }
-            LocationServices.GeofencingApi.addGeofences(googleApiClient, gfRequest, pendingIntent).setResultCallback(new ResultCallback<Status>() {
-                @Override
-                public void onResult(@NonNull Status status) {
-                    if(status.isSuccess()){
-                        Log.d(TAG,"successfully added geofence");
-
-                    }else{
-                        Log.d(TAG,"failed to add geofence " + status.getStatus());
-                    }
-                }
-            });
-        }
 
     }
     private void signInAnonymously() {
