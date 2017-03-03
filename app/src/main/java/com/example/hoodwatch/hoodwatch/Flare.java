@@ -12,7 +12,21 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 
 public class Flare implements Serializable {
-    private String flareID, imagename,flareText, classification, userName, address;
+    private String flareID;
+    private String imagename;
+
+    public void setflareText(String flareText) {
+        this.flareText = flareText;
+    }
+
+    public String getflareText() {
+        return flareText;
+    }
+
+    private String flareText;
+    private String classification;
+    private String userName;
+    private String address;
     private Double latitude, longtitude;
     private long time;
     private String type;
@@ -54,13 +68,6 @@ public class Flare implements Serializable {
         this.imagename = imagename;
     }
 
-    protected String getFlareText() {
-        return flareText;
-    }
-
-    protected void setFlareText(String flareText) {
-        this.flareText = flareText;
-    }
 
     public String getClassification() {
         return classification;
