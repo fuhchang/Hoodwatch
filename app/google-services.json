@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "101626633739",
+    "firebase_url": "https://hoodwatch-d34f2.firebaseio.com",
+    "project_id": "hoodwatch-d34f2",
+    "storage_bucket": "hoodwatch-d34f2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:101626633739:android:99fa3929a32b68d7",
+        "android_client_info": {
+          "package_name": "com.example.hoodwatch.hoodwatch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "101626633739-jv3aapfp1oici92tg166tmafmifi01i8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvD6fNFvEfDreGrVX3E9pJ2v9Bhk3-QZ0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "101626633739-jv3aapfp1oici92tg166tmafmifi01i8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

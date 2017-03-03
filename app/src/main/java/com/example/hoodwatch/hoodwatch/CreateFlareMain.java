@@ -15,11 +15,13 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -44,6 +46,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -198,11 +201,14 @@ public class CreateFlareMain extends AppCompatActivity {
             try {
                 imageBitmap = MediaStore.Images.Media.getBitmap(
                         getApplicationContext().getContentResolver(), imageUri);
+
                 ImageView img = (ImageView) findViewById(R.id.upload);
+                img.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
                 img.setDrawingCacheEnabled(true);
                 img.buildDrawingCache();
-                img.setImageBitmap(imageBitmap);
-                Bitmap bitmap = img.getDrawingCache();
+                Picasso.with(this).load(imageUri).rotate(90).into(img);
+//                img.setImageBitmap(imageBitmap);
+                Bitmap bitmap = Bitmap.createBitmap(img.getDrawingCache());
 ////                saveToInternalStorage(imageBitmap, imgName);
 ////                loadImageFromStorage(path);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
@@ -322,7 +328,7 @@ public class CreateFlareMain extends AppCompatActivity {
         StorageReference mountainsRef = mStorageRef.child(imgName+".jpg");
         if(imgData != null){
             Toast.makeText(getApplicationContext(), "not null", Toast.LENGTH_SHORT).show();
-            UploadTask uploadTask = mountainsRef.putBytes(imgData);
+            UploadTask uploadTask = mountainsRef.putFile(imageUri);
             uploadTask.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
@@ -334,7 +340,7 @@ public class CreateFlareMain extends AppCompatActivity {
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                     Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_LONG).show();
-                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
+
                 }
             });
         }else{
