@@ -278,12 +278,8 @@ public class MainActivity extends Activity {
     }
 
     private void changelist(){
-
-        String permission = "android.permission.ACCESS_FINE_LOCATION";
-        int permissionCheck = MainActivity.this.checkCallingOrSelfPermission(permission);
-        Geocoder geocode = new Geocoder(getBaseContext());
-        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            System.out.println("ppp");
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             double longitude = location.getLongitude();
             double latitude = location.getLatitude();
             Location locationA = new Location("point A");
@@ -291,6 +287,7 @@ public class MainActivity extends Activity {
             locationA.setLatitude(latitude);
             Location locationB = new Location("point B");
             for (Flare flare : allFlares) {
+                System.out.println(flare.getFlareText());
                 locationB.setLatitude(flare.getLatitude());
                 locationB.setLongitude(flare.getLongtitude());
                 float distance = locationA.distanceTo(locationB);
@@ -300,7 +297,7 @@ public class MainActivity extends Activity {
                 }
             }
 
-
+        }
     }
     private void signInAnonymously() {
         mAuth.signInAnonymously().addOnSuccessListener(this, new  OnSuccessListener<AuthResult>() {
