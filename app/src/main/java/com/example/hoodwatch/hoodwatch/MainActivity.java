@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,6 +22,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -41,6 +43,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
@@ -286,13 +290,13 @@ public class MainActivity extends Activity {
             locationA.setLongitude(longitude);
             locationA.setLatitude(latitude);
             Location locationB = new Location("point B");
-            for (Flare flare : allFlares) {
+            for (final Flare flare : allFlares) {
                 System.out.println(flare.getFlareText());
                 locationB.setLatitude(flare.getLatitude());
                 locationB.setLongitude(flare.getLongtitude());
                 float distance = locationA.distanceTo(locationB);
                 if (distance < 500) {
-                    listofFlares.add(flare);
+                listofFlares.add(flare);
 
                 }
             }

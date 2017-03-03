@@ -5,7 +5,9 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +17,11 @@ import android.widget.TextView;
 
 import com.beardedhen.androidbootstrap.BootstrapWell;
 import com.beardedhen.androidbootstrap.TypefaceProvider;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by norman on 29/11/16.
@@ -24,37 +31,54 @@ public class openFlare extends AppCompatActivity {
     Intent intent;
     double lat;
     double lng;
+    private StorageReference mStorageRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_open_flare);
         TypefaceProvider.registerDefaultIconSets();
-
+        mStorageRef = FirebaseStorage.getInstance().getReference();
         Bundle bundle = getIntent().getExtras();
         String address = bundle.getString("add");
         String text = bundle.getString("post");
-        String imagename = bundle.getString("imagename");
+        final String imagename = bundle.getString("imagename");
         lat = bundle.getDouble("lat");
         lng = bundle.getDouble("long");
         String classification = bundle.getString("classification");
         TextView tv_add = (TextView)findViewById(R.id.tv_openadd);
         TextView tv_post = (TextView)findViewById(R.id.tv_opentext);
-        ImageView iv_image = (ImageView)findViewById(R.id.iv_openimage);
+        final ImageView iv_image = (ImageView)findViewById(R.id.iv_openimage);
         ImageView iv_icon = (ImageView)findViewById(R.id.iv_openicon);
         tv_add.setText(address);
         tv_post.setText(text);
-        Flare f = new Flare();
-        if(imagename.equals("")){
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            lp.topMargin = 30;
-            iv_image.setLayoutParams(lp);
-        }
-        else {
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            lp.topMargin = 50;
-            iv_image.setLayoutParams(lp);
-            iv_image.setImageBitmap(f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", imagename + ".jpg"));
-        }
+        final Flare f = new Flare();
+//        if(imagename.equals("")){
+//            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//            lp.topMargin = 30;
+//            iv_image.setLayoutParams(lp);
+//        }
+//        else {
+//            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//            lp.topMargin = 50;
+//            iv_image.setLayoutParams(lp);
+//            iv_image.setImageBitmap(f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", imagename + ".jpg"));
+//        }
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
+        StorageReference imagesRef = mStorageRef.child(imagename+".jpg");
+        imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Log.i("firebase success img",uri.getPath());
+                Picasso.with(getApplicationContext()).load(uri).rotate(90).into(iv_image);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Log.i("firebase error img "+imagename,exception.getMessage());
+            }
+        });
         Log.d("class", classification);
         if(classification.equals("light")){
             iv_icon.setImageResource(this.getResources().getIdentifier("cat1", "mipmap", this.getPackageName()));

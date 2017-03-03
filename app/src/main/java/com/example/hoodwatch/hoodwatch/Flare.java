@@ -2,6 +2,7 @@ package com.example.hoodwatch.hoodwatch;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -15,7 +16,7 @@ public class Flare implements Serializable {
     private Double latitude, longtitude;
     private long time;
     private String type;
-
+    private Uri uri;
     public Flare(){
         flareID = "";
         imagename = "";
@@ -26,6 +27,15 @@ public class Flare implements Serializable {
         latitude = 0.0;
         longtitude = 0.0;
         time = 0L;
+    }
+
+
+    public Uri getUri() {
+        return uri;
+    }
+
+    public void setUri(Uri uri) {
+        this.uri = uri;
     }
 
     public String getFlareID() {

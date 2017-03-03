@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
+import android.net.Uri;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +19,14 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
+
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
@@ -27,6 +37,7 @@ import java.util.ResourceBundle;
 import javax.crypto.spec.RC2ParameterSpec;
 
 import static android.support.v4.content.ContextCompat.startActivity;
+import static com.bumptech.glide.Glide.with;
 
 /**
  * Created by norman on 28/11/16.
@@ -37,7 +48,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
 
     private List<Flare> allFlares = new ArrayList<>();
     private Context mContext;
-
+    private StorageReference mStorageRef;
     public class MyViewHolder extends RecyclerView.ViewHolder{
         public TextView tv, tv_add, tv_lat, tv_long;
         public ImageView iv, iv_icon;
@@ -68,27 +79,44 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
 
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
-        Flare f = allFlares.get(position);
+    public void onBindViewHolder(final MyViewHolder holder, int position) {
+        final Flare f = allFlares.get(position);
         holder.tv.setText(f.getFlareText());
         holder.tv.setTextSize(30);
         holder.tv.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
         holder.tv_add.setText(f.getAddress());
         holder.tv_lat.setText(f.getLatitude().toString());
         holder.tv_long.setText(f.getLongtitude().toString());
-        Log.d("Address: ", f.getAddress());
-        holder.iv.setImageBitmap(f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg"));
-        if((f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg") == null)){
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            lp.topMargin = 30;
-            holder.iv.setLayoutParams(lp);
-        }
-        else{
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 600);
-            lp.topMargin = 50;
+//        Log.d("Address: ", f.getAddress());
+//        holder.iv.setImageBitmap(f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg"));
+//        if((f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg") == null)){
+//            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//            lp.topMargin = 30;
+//            holder.iv.setLayoutParams(lp);
+//        }
+//        else{
+//            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 600);
+//            lp.topMargin = 50;
+//
+//            holder.iv.setLayoutParams(lp);
+//        }
 
-            holder.iv.setLayoutParams(lp);
-        }
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
+        StorageReference imagesRef = mStorageRef.child(f.getImagename()+".jpg");
+        imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Log.i("firebase success img",uri.getPath());
+                Picasso.with(mContext).load(uri).rotate(90).into(holder.iv);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Log.i("firebase error img "+f.getImagename(),exception.getMessage());
+            }
+        });
 
         if(f.getType().equals("light")){
             holder.iv_icon.setImageResource(mContext.getResources().getIdentifier("cat1", "mipmap", mContext.getPackageName()));
