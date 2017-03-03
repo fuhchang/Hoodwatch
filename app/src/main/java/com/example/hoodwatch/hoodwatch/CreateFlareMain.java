@@ -15,7 +15,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,7 +27,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.content.pm.Signature;
 import android.widget.Toast;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
@@ -56,7 +54,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 public class CreateFlareMain extends AppCompatActivity {
@@ -308,7 +305,7 @@ public class CreateFlareMain extends AppCompatActivity {
         flare.setFlareID(imgName);
         flare.setImagename(imgName);
         EditText text = (EditText) findViewById(R.id.msg);
-        flare.setFlareText(text.getText().toString());
+        flare.setflareText(text.getText().toString());
         flare.setUserName(username);
         flare.setLatitude(lat);
         flare.setLongtitude(lng);

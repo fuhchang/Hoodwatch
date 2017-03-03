@@ -29,7 +29,6 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -138,6 +137,7 @@ public class MainActivity extends Activity {
                                     for(DataSnapshot children: child.getChildren()){
                                        Flare flare = children.getValue(Flare.class);
                                         allFlares.add(flare);
+
                                         geoList.add(new Geofence.Builder()
                                                 .setRequestId(flare.getFlareID())
                                                 .setCircularRegion(flare.getLatitude(), flare.getLongtitude(), 100)
@@ -287,7 +287,8 @@ public class MainActivity extends Activity {
             locationA.setLatitude(latitude);
             Location locationB = new Location("point B");
             for (Flare flare : allFlares) {
-                System.out.println(flare.getFlareText());
+                System.out.println(flare.getflareText());
+                System.out.println(flare.getType());
                 locationB.setLatitude(flare.getLatitude());
                 locationB.setLongitude(flare.getLongtitude());
                 float distance = locationA.distanceTo(locationB);
@@ -339,7 +340,7 @@ public class MainActivity extends Activity {
                 Flare f = new Flare();
                 f.setFlareID(row[0]);
                 f.setImagename(row[1]);
-                f.setFlareText(row[2]);
+                f.setflareText(row[2]);
                 f.setClassification(row[3]);
                 f.setUserName(row[4]);
                 f.setLatitude(Double.parseDouble(row[5]));

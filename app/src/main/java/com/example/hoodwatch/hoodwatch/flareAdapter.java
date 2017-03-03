@@ -3,8 +3,6 @@ package com.example.hoodwatch.hoodwatch;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.Image;
-import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -12,21 +10,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.ResourceBundle;
-
-import javax.crypto.spec.RC2ParameterSpec;
-
-import static android.support.v4.content.ContextCompat.startActivity;
 
 /**
  * Created by norman on 28/11/16.
@@ -70,7 +59,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Flare f = allFlares.get(position);
-        holder.tv.setText(f.getFlareText());
+        holder.tv.setText(f.getflareText());
         holder.tv.setTextSize(30);
         holder.tv.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
         holder.tv_add.setText(f.getAddress());
@@ -124,7 +113,7 @@ class myOwnClickListener implements View.OnClickListener
         Intent intent = new Intent(mContext, openFlare.class);
         Log.d("address :", f.getAddress());
         intent.putExtra("add", f.getAddress());
-        intent.putExtra("post", f.getFlareText());
+        intent.putExtra("post", f.getflareText());
         intent.putExtra("imagename", f.getImagename());
         intent.putExtra("classification", f.getClassification());
         intent.putExtra("lat", f.getLatitude());
