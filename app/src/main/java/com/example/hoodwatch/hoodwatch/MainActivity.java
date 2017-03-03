@@ -282,7 +282,7 @@ public class MainActivity extends Activity {
         String permission = "android.permission.ACCESS_FINE_LOCATION";
         int permissionCheck = MainActivity.this.checkCallingOrSelfPermission(permission);
         Geocoder geocode = new Geocoder(getBaseContext());
-        //Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             System.out.println("ppp");
             double longitude = location.getLongitude();
             double latitude = location.getLatitude();
