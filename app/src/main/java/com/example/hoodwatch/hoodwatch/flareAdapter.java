@@ -80,8 +80,8 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
-        final Flare f = allFlares.get(position);
-        holder.tv.setText(f.getFlareText());
+        Flare f = allFlares.get(position);
+        holder.tv.setText(f.getflareText());
         holder.tv.setTextSize(30);
         holder.tv.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
         holder.tv_add.setText(f.getAddress());
@@ -114,7 +114,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
-                Log.i("firebase error img "+f.getImagename(),exception.getMessage());
+                Log.i("firebase error img ",exception.getMessage());
             }
         });
 
@@ -152,7 +152,7 @@ class myOwnClickListener implements View.OnClickListener
         Intent intent = new Intent(mContext, openFlare.class);
         Log.d("address :", f.getAddress());
         intent.putExtra("add", f.getAddress());
-        intent.putExtra("post", f.getFlareText());
+        intent.putExtra("post", f.getflareText());
         intent.putExtra("imagename", f.getImagename());
         intent.putExtra("classification", f.getClassification());
         intent.putExtra("lat", f.getLatitude());
