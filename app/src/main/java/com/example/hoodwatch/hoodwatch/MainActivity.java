@@ -134,7 +134,6 @@ public class MainActivity extends Activity {
                                 listofFlares.clear();
                                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                                     maxSize = (int)child.getChildrenCount();
-                                    System.out.println(maxSize);
                                     for(DataSnapshot children: child.getChildren()){
                                        Flare flare = children.getValue(Flare.class);
                                         allFlares.add(flare);
@@ -287,17 +286,40 @@ public class MainActivity extends Activity {
             locationA.setLatitude(latitude);
             Location locationB = new Location("point B");
             for (Flare flare : allFlares) {
-                System.out.println(flare.getflareText());
+
                 locationB.setLatitude(flare.getLatitude());
                 locationB.setLongitude(flare.getLongtitude());
-                float distance = locationA.distanceTo(locationB);
+                double distance = distance_between(locationA, locationB);
+                System.out.println("Distance : " + distance);
                 if (distance < 500) {
+                    System.out.println("name : " + flare.getFlareID());
                     listofFlares.add(flare);
+
 
                 }
             }
 
         }
+    }
+    private double distance_between(Location l1, Location l2)
+    {
+        //http://stackoverflow.com/questions/18377587/android-distanceto-wrong-values
+        double lat1=l1.getLatitude();
+        double lon1=l1.getLongitude();
+        double lat2=l2.getLatitude();
+        double lon2=l2.getLongitude();
+        double R = 6371; // km
+        double dLat = (lat2-lat1)*Math.PI/180;
+        double dLon = (lon2-lon1)*Math.PI/180;
+        lat1 = lat1*Math.PI/180;
+        lat2 = lat2*Math.PI/180;
+
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double d = R * c * 1000;
+
+        return d;
     }
     private void signInAnonymously() {
         mAuth.signInAnonymously().addOnSuccessListener(this, new  OnSuccessListener<AuthResult>() {
