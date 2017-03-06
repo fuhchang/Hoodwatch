@@ -222,6 +222,7 @@ public class CreateFlareMain extends AppCompatActivity {
         }
     }
 
+    
     private String saveToInternalStorage(Bitmap bitmapImage, String imgName) {
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         // path to /data/data/yourapp/app_data/imageDir
