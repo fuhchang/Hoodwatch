@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
+import com.bumptech.glide.Glide;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
@@ -44,7 +45,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -203,7 +203,7 @@ public class CreateFlareMain extends AppCompatActivity {
                 img.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 img.setDrawingCacheEnabled(true);
                 img.buildDrawingCache();
-                Picasso.with(this).load(imageUri).rotate(90).into(img);
+                Glide.with(getApplication()).load(imageUri).centerCrop().crossFade().into(img);
 //                img.setImageBitmap(imageBitmap);
                 Bitmap bitmap = Bitmap.createBitmap(img.getDrawingCache());
 ////                saveToInternalStorage(imageBitmap, imgName);
