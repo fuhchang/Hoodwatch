@@ -22,7 +22,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
 
 /**
  * Created by norman on 29/11/16.
@@ -73,7 +72,7 @@ public class openFlare extends AppCompatActivity {
             public void onSuccess(Uri uri) {
                 Log.i("firebase success img",uri.getPath());
 //                Picasso.with(mContext).load(uri).rotate(90).into(holder.iv);
-                Glide.with(getApplicationContext()).load(uri).centerCrop().crossFade().into(iv_image);
+                Glide.with(getApplication()).load(uri).centerCrop().crossFade().into(iv_image);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
