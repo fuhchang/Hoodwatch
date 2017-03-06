@@ -70,7 +70,7 @@ public class openFlare extends AppCompatActivity {
             @Override
             public void onSuccess(Uri uri) {
                 Log.i("firebase success img",uri.getPath());
-                Picasso.with(getApplicationContext()).load(uri).rotate(90).into(iv_image);
+                Picasso.with(getApplicationContext()).load(uri).into(iv_image);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

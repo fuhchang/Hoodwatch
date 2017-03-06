@@ -108,7 +108,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             @Override
             public void onSuccess(Uri uri) {
                 Log.i("firebase success img",uri.getPath());
-                Picasso.with(mContext).load(uri).rotate(90).into(holder.iv);
+                Picasso.with(mContext).load(uri).into(holder.iv);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
