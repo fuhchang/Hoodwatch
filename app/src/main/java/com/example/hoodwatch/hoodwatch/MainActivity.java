@@ -17,6 +17,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +28,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.identity.intents.Address;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
@@ -42,8 +44,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import static android.content.ContentValues.TAG;
 
@@ -51,7 +58,9 @@ public class MainActivity extends Activity {
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS= 2;
     String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     GoogleApiClient googleApiClient = null;
+
     private DatabaseReference mPostReference;
+    private StorageReference mStorageRef;
     int maxSize =0;
     ArrayList<Geofence> geoList = new ArrayList<>();
     ArrayList<Flare> listofFlares = new ArrayList<>();
@@ -83,13 +92,15 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rv = (RecyclerView) findViewById(R.id.rv_main);
-        rv.setHasFixedSize(true);
+        rv.setHasFixedSize(false);
         mPostReference = FirebaseDatabase.getInstance().getReference();
+        mStorageRef = FirebaseStorage.getInstance().getReference();
         adapter = new flareAdapter(this, listofFlares);
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 1);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         rv.setLayoutManager(mLayoutManager);
         rv.setItemAnimator(new DefaultItemAnimator());
         rv.setAdapter(adapter);
+
         myFab = (FloatingActionButton)findViewById(R.id.addFlare);
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -131,12 +142,20 @@ public class MainActivity extends Activity {
                         ValueEventListener pl = new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
+                                Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+
                                 allFlares.clear();
                                 listofFlares.clear();
                                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                                     maxSize = (int)child.getChildrenCount();
                                     for(DataSnapshot children: child.getChildren()){
-                                       Flare flare = children.getValue(Flare.class);
+                                        Flare flare = children.getValue(Flare.class);
+                                        try {
+                                            List<android.location.Address> list  = geocoder.getFromLocation(flare.getLatitude(),flare.getLongtitude(),1);
+                                            flare.setAddress(list.get(0).getAddressLine(0));
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
                                         allFlares.add(flare);
                                         geoList.add(new Geofence.Builder()
                                                 .setRequestId(flare.getFlareID())
@@ -146,6 +165,7 @@ public class MainActivity extends Activity {
                                                 .setLoiteringDelay(1000)
                                                 .setNotificationResponsiveness(1000)
                                                 .build());
+
                                     }
 
                                 }
@@ -166,12 +186,12 @@ public class MainActivity extends Activity {
                                 }));
 
 
-                                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                                        location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-                                        if (location == null) {
-                                            System.out.println("HAHAHA SHIT ASSIGNMENT");
-                                        }
-                                        else{
+                                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                    location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+                                    if (location == null) {
+                                        System.out.println("HAHAHA SHIT ASSIGNMENT");
+                                    }
+                                    else{
                                         lm = (LocationManager) getSystemService(MainActivity.LOCATION_SERVICE);
                                         android.location.LocationListener locationlistener = new android.location.LocationListener() {
                                             @Override
@@ -248,7 +268,7 @@ public class MainActivity extends Activity {
                                             changelist();
                                             adapter.notifyDataSetChanged();
                                         }
-                                        }
+                                    }
                                 }
                                 adapter.notifyDataSetChanged();
 

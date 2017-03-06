@@ -200,7 +200,7 @@ public class CreateFlareMain extends AppCompatActivity {
                         getApplicationContext().getContentResolver(), imageUri);
 
                 ImageView img = (ImageView) findViewById(R.id.upload);
-                img.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
+                img.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 img.setDrawingCacheEnabled(true);
                 img.buildDrawingCache();
                 Picasso.with(this).load(imageUri).rotate(90).into(img);

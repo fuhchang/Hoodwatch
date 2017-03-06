@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.beardedhen.androidbootstrap.BootstrapWell;
 import com.beardedhen.androidbootstrap.TypefaceProvider;
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -37,7 +38,7 @@ public class openFlare extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_open_flare);
         TypefaceProvider.registerDefaultIconSets();
-        mStorageRef = FirebaseStorage.getInstance().getReference();
+
         Bundle bundle = getIntent().getExtras();
         String address = bundle.getString("add");
         String text = bundle.getString("post");
@@ -51,7 +52,6 @@ public class openFlare extends AppCompatActivity {
         ImageView iv_icon = (ImageView)findViewById(R.id.iv_openicon);
         tv_add.setText(address);
         tv_post.setText(text);
-        final Flare f = new Flare();
 //        if(imagename.equals("")){
 //            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 //            lp.topMargin = 30;
@@ -63,20 +63,23 @@ public class openFlare extends AppCompatActivity {
 //            iv_image.setLayoutParams(lp);
 //            iv_image.setImageBitmap(f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", imagename + ".jpg"));
 //        }
+
+
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        StorageReference imagesRef = mStorageRef.child(imagename+".jpg");
+        StorageReference imagesRef = mStorageRef.child(imagename +".jpg");
         imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 Log.i("firebase success img",uri.getPath());
-                Picasso.with(getApplicationContext()).load(uri).into(iv_image);
+//                Picasso.with(mContext).load(uri).rotate(90).into(holder.iv);
+                Glide.with(getApplicationContext()).load(uri).centerCrop().crossFade().into(iv_image);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
-                Log.i("firebase error img "+imagename,exception.getMessage());
+                Log.i("firebase error img ",exception.getMessage());
             }
         });
         Log.d("class", classification);

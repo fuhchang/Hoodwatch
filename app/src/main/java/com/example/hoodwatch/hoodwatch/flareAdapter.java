@@ -87,6 +87,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         holder.tv_add.setText(f.getAddress());
         holder.tv_lat.setText(f.getLatitude().toString());
         holder.tv_long.setText(f.getLongtitude().toString());
+//        Picasso.with(mContext).load(f.getUri()).rotate(90).into(holder.iv);
 //        Log.d("Address: ", f.getAddress());
 //        holder.iv.setImageBitmap(f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg"));
 //        if((f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", f.getImagename()+".jpg") == null)){
@@ -108,7 +109,8 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             @Override
             public void onSuccess(Uri uri) {
                 Log.i("firebase success img",uri.getPath());
-                Picasso.with(mContext).load(uri).into(holder.iv);
+//                Picasso.with(mContext).load(uri).rotate(90).into(holder.iv);
+                Glide.with(mContext).load(uri).centerCrop().crossFade().into(holder.iv);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
