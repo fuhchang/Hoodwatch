@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -49,6 +50,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -100,7 +102,28 @@ public class MainActivity extends Activity {
         rv.setLayoutManager(mLayoutManager);
         rv.setItemAnimator(new DefaultItemAnimator());
         rv.setAdapter(adapter);
-
+        final SwipeRefreshLayout swipeRefresh = (SwipeRefreshLayout)findViewById(R.id.swipeRefreshLayout);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
+            @Override
+            public void onRefresh(){
+                refreshItems();
+            }
+            void refreshItems() {
+                // Load items
+                // ...
+                listofFlares.clear();
+                changelist();
+                // Load complete
+                onItemsLoadComplete();
+            }
+            void onItemsLoadComplete() {
+                // Update the adapter and notify data set changed
+                // ...
+                adapter.notifyDataSetChanged();
+                // Stop refresh animation
+                swipeRefresh.setRefreshing(false);
+            }
+        });
         myFab = (FloatingActionButton)findViewById(R.id.addFlare);
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -338,7 +361,7 @@ public class MainActivity extends Activity {
                     listofFlares.add(flare);
                 }
             }
-
+            Collection
         }
     }
     private double distance_between(Location l1, Location l2)
