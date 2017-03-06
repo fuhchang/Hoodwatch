@@ -65,11 +65,11 @@ public class CreateFlareMain extends AppCompatActivity {
     String imgName;
     EditText txt;
     String type;
-    boolean checkImgExit = false;
     int maxcount;
     String username;
     Bitmap imageBitmap = null;
     byte[] imgData;
+    ImageView img;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     private DatabaseReference mDatabase;
     private StorageReference mStorageRef;
@@ -106,23 +106,14 @@ public class CreateFlareMain extends AppCompatActivity {
             ActivityCompat.requestPermissions(CreateFlareMain.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
         }
         im = (ImageView) findViewById(R.id.upload);
+
         im.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ContentValues values = new ContentValues();
-                values.put(MediaStore.Images.Media.TITLE, "New Picture");
-                values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
-                imageUri = getContentResolver().insert(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                } else {
-                    Log.d("camera", "no camera");
-                }
+                captureImage();
             }
         });
+
         // BootstrapCircleThumbnail thumb = (BootstrapCircleThumbnail) findViewById(R.id.thumb);
         ImageView thumb = (ImageView) findViewById(R.id.thumb);
         thumb.setOnClickListener(new View.OnClickListener() {
@@ -171,6 +162,7 @@ public class CreateFlareMain extends AppCompatActivity {
                     }
 
                 }
+
                 startLocationMonitoring();
             }
 
@@ -190,8 +182,6 @@ public class CreateFlareMain extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        ByteArrayOutputStream fos = new ByteArrayOutputStream();
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
 
@@ -199,21 +189,12 @@ public class CreateFlareMain extends AppCompatActivity {
                 imageBitmap = MediaStore.Images.Media.getBitmap(
                         getApplicationContext().getContentResolver(), imageUri);
 
-                ImageView img = (ImageView) findViewById(R.id.upload);
+                img = (ImageView) findViewById(R.id.upload);
                 img.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 img.setDrawingCacheEnabled(true);
                 img.buildDrawingCache();
                 Glide.with(getApplication()).load(imageUri).centerCrop().crossFade().into(img);
-//                img.setImageBitmap(imageBitmap);
-                Bitmap bitmap = Bitmap.createBitmap(img.getDrawingCache());
-////                saveToInternalStorage(imageBitmap, imgName);
-////                loadImageFromStorage(path);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                if (fos != null) {
-                    imgData = fos.toByteArray();
-                }
-                mStorageRef = FirebaseStorage.getInstance().getReference();
-                checkImgExit = true;
+
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -301,6 +282,7 @@ public class CreateFlareMain extends AppCompatActivity {
     }
 
     private void createFlare() {
+        ByteArrayOutputStream fos = new ByteArrayOutputStream();
         Flare flare = new Flare();
         System.out.println("img " + imgName);
         flare.setFlareID(imgName);
@@ -323,6 +305,12 @@ public class CreateFlareMain extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mDatabase.child("event").child(imgName).setValue(flare);
+        Bitmap bitmap = Bitmap.createBitmap(img.getDrawingCache());
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+        if (fos != null) {
+            imgData = fos.toByteArray();
+        }
+        mStorageRef = FirebaseStorage.getInstance().getReference();
         StorageReference mountainsRef = mStorageRef.child(imgName+".jpg");
         if(imgData != null){
             Toast.makeText(getApplicationContext(), "not null", Toast.LENGTH_SHORT).show();
@@ -371,5 +359,20 @@ public class CreateFlareMain extends AppCompatActivity {
                 .setObject(object)
                 .setActionStatus(Action.STATUS_TYPE_COMPLETED)
                 .build();
+    }
+
+    public void captureImage(){
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "New Picture");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+        imageUri = getContentResolver().insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        } else {
+            Log.d("camera", "no camera");
+        }
     }
 }

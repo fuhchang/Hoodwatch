@@ -152,7 +152,9 @@ public class MainActivity extends Activity {
                                         Flare flare = children.getValue(Flare.class);
                                         try {
                                             List<android.location.Address> list  = geocoder.getFromLocation(flare.getLatitude(),flare.getLongtitude(),1);
-                                            flare.setAddress(list.get(0).getAddressLine(0));
+                                            if(list.size() != 0) {
+                                                flare.setAddress(list.get(0).getAddressLine(0));
+                                            }
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
