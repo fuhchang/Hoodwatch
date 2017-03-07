@@ -28,20 +28,20 @@
         android:nestedScrollingEnabled="false"
         android:layout_marginTop="10dp"
         >
-    <ImageView
+    <test.jinesh.loadingviews.LoadingImageView
         android:layout_width="match_parent"
         android:layout_height="500dp"
         android:scaleType="centerCrop"
         android:id="@+id/iv_openimage"
         />
-    <ImageView
+    <test.jinesh.loadingviews.LoadingImageView
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:id="@+id/iv_openicon"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         />
-    <TextView
+    <test.jinesh.loadingviews.LoadingTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tv_openadd"
@@ -51,7 +51,7 @@
         android:textStyle="bold"
         android:textSize="22dp"
         android:layout_below="@+id/iv_openimage"/>
-    <TextView
+    <test.jinesh.loadingviews.LoadingTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tv_opentext"
