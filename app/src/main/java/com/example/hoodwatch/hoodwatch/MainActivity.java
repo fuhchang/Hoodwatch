@@ -108,7 +108,7 @@ public class MainActivity extends Activity {
         } else {
             signInAnonymously();
         }
-        Geocoder geocoder = new Geocoder(getBaseContext());
+
         geoList.clear();
 
         googleApiClient = new GoogleApiClient.Builder(this)
@@ -236,7 +236,6 @@ public class MainActivity extends Activity {
                                                     //                                          int[] grantResults)
                                                     // to handle the case where the user grants the permission. See the documentation
                                                     // for ActivityCompat#requestPermissions for more details.
-                                                    System.out.println("hello world");
                                                     if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                                                         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
                                                         check = true;
