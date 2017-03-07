@@ -62,7 +62,6 @@ public class MainActivity extends Activity {
     GoogleApiClient googleApiClient = null;
 
     private DatabaseReference mPostReference;
-    private StorageReference mStorageRef;
     int maxSize =0;
     ArrayList<Geofence> geoList = new ArrayList<>();
     ArrayList<Flare> listofFlares = new ArrayList<>();
@@ -96,7 +95,6 @@ public class MainActivity extends Activity {
         rv = (RecyclerView) findViewById(R.id.rv_main);
         rv.setHasFixedSize(false);
         mPostReference = FirebaseDatabase.getInstance().getReference();
-        mStorageRef = FirebaseStorage.getInstance().getReference();
         adapter = new flareAdapter(this, listofFlares);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         rv.setLayoutManager(mLayoutManager);
