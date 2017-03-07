@@ -87,12 +87,10 @@ public class CreateFlareMain extends AppCompatActivity {
         setContentView(R.layout.activity_create_flare_main);
         TypefaceProvider.registerDefaultIconSets();
         Bundle bundle = getIntent().getExtras();
-        type = bundle.getString("type");
+
         maxcount = bundle.getInt("maxcount");
         username = bundle.getString("username");
-        System.out.println("count " + maxcount);
         imgName = "Image" + (maxcount + 1);
-        System.out.println("image "+ imgName);
         // get reference to 'users' node
 
 
@@ -290,7 +288,7 @@ public class CreateFlareMain extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        flare.setType(type);
+        flare.setType("mid");
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mDatabase.child("event").child(imgName).setValue(flare);
@@ -321,7 +319,8 @@ public class CreateFlareMain extends AppCompatActivity {
         }else{
             Toast.makeText(getApplicationContext(), "is null", Toast.LENGTH_SHORT).show();
         }
-        Intent intent = new Intent(CreateFlareMain.this, MainActivity.class);
+        Intent intent = new Intent(CreateFlareMain.this, LocationSelectionActivity.class);
+        intent.putExtra("flare",flare);
         startActivity(intent);
         finish();
     }
@@ -363,5 +362,10 @@ public class CreateFlareMain extends AppCompatActivity {
         } else {
             Log.d("camera", "no camera");
         }
+    }
+
+    public void selectLoc(){
+        Intent intent = new Intent(this,LocationSelectionActivity.class);
+        startActivity(intent);
     }
 }

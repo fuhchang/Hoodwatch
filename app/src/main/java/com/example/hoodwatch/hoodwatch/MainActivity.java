@@ -174,11 +174,9 @@ public class MainActivity extends Activity {
                                     public void onClick(View v){
                                         //call activity add flare
                                         //adapter.notifyDataSetChanged();
-                                        Intent intent = new Intent(MainActivity.this,CreateFlareType.class);
+                                        Intent intent = new Intent(MainActivity.this,CreateFlareMain.class);
                                         intent.putExtra("username","norman");
-
                                         intent.putExtra("maxcount", maxSize);
-
                                         intent.putExtra("map", allFlares);
                                         startActivity(intent);
                                         finish();
