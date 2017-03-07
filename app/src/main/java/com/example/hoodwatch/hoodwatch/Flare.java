@@ -15,6 +15,15 @@ public class Flare implements Serializable {
     private String flareID;
     private String imagename;
 
+    public double getFlareDistance() {
+        return flareDistance;
+    }
+
+    public void setFlareDistance(double flareDistance) {
+        this.flareDistance = flareDistance;
+    }
+
+    private double flareDistance;
     public void setflareText(String flareText) {
         this.flareText = flareText;
     }

@@ -49,8 +49,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -62,6 +66,7 @@ public class MainActivity extends Activity {
     GoogleApiClient googleApiClient = null;
 
     private DatabaseReference mPostReference;
+    private StorageReference mStorageRef;
     int maxSize =0;
     ArrayList<Geofence> geoList = new ArrayList<>();
     ArrayList<Flare> listofFlares = new ArrayList<>();
@@ -95,6 +100,7 @@ public class MainActivity extends Activity {
         rv = (RecyclerView) findViewById(R.id.rv_main);
         rv.setHasFixedSize(false);
         mPostReference = FirebaseDatabase.getInstance().getReference();
+        mStorageRef = FirebaseStorage.getInstance().getReference();
         adapter = new flareAdapter(this, listofFlares);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         rv.setLayoutManager(mLayoutManager);
@@ -129,7 +135,7 @@ public class MainActivity extends Activity {
         } else {
             signInAnonymously();
         }
-
+        Geocoder geocoder = new Geocoder(getBaseContext());
         geoList.clear();
 
         googleApiClient = new GoogleApiClient.Builder(this)
@@ -172,11 +178,10 @@ public class MainActivity extends Activity {
                                     for(DataSnapshot children: child.getChildren()){
                                         Flare flare = children.getValue(Flare.class);
                                         try {
-                                            List<android.location.Address> list  = geocoder.getFromLocation(flare.getLatitude(),flare.getLongtitude(),1);
-                                            if(list.size() != 0) {
-                                                flare.setAddress(list.get(0).getAddressLine(0));
-                                            }
-                                        } catch (IOException e) {
+                                                List<android.location.Address> list = geocoder.getFromLocation(flare.getLatitude(), flare.getLongtitude(), 1);
+                                                String a = list.get(0).getAddressLine(0);
+                                                flare.setAddress(a);
+                                        } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                         allFlares.add(flare);
@@ -192,7 +197,12 @@ public class MainActivity extends Activity {
                                     }
 
                                 }
-
+                                Collections.sort(allFlares, new Comparator<Flare>() {
+                                    @Override
+                                    public int compare(Flare flare, Flare t1) {
+                                        return (Integer.parseInt(flare.getFlareID().substring(flare.getFlareID().indexOf("e")+1, flare.getFlareID().length())) > Integer.parseInt(t1.getFlareID().substring(t1.getFlareID().indexOf("e")+1, t1.getFlareID().length()))) ? -1: (Integer.parseInt(flare.getFlareID().substring(flare.getFlareID().indexOf("e")+1, flare.getFlareID().length())) > Integer.parseInt(t1.getFlareID().substring(t1.getFlareID().indexOf("e")+1, t1.getFlareID().length()))) ? 1:0 ;
+                                    }
+                                });
                                 myFab.setOnClickListener((new View.OnClickListener(){
                                     public void onClick(View v){
                                         //call activity add flare
@@ -212,7 +222,6 @@ public class MainActivity extends Activity {
                                 if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                     location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
                                     if (location == null) {
-                                        System.out.println("HAHAHA SHIT ASSIGNMENT");
                                     }
                                     else{
                                         lm = (LocationManager) getSystemService(MainActivity.LOCATION_SERVICE);
@@ -257,6 +266,7 @@ public class MainActivity extends Activity {
                                                     //                                          int[] grantResults)
                                                     // to handle the case where the user grants the permission. See the documentation
                                                     // for ActivityCompat#requestPermissions for more details.
+                                                    System.out.println("hello world");
                                                     if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                                                         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
                                                         check = true;
@@ -344,7 +354,6 @@ public class MainActivity extends Activity {
             startLocationMonitoring();
             double longitude = location.getLongitude();
             double latitude = location.getLatitude();
-            System.out.println(location.getLongitude() + " : "+ location.getLatitude());
             Location locationA = new Location("point A");
             locationA.setLongitude(longitude);
             locationA.setLatitude(latitude);
@@ -354,35 +363,16 @@ public class MainActivity extends Activity {
                 locationB.setLatitude(flare.getLatitude());
                 locationB.setLongitude(flare.getLongtitude());
                 double distance = location.distanceTo(locationB);
-                System.out.println("Distance : " + distance);
                 if (distance < 500) {
-                    System.out.println("name : " + flare.getFlareID());
+                    DecimalFormat df = new DecimalFormat("#.#");
+                    df.setRoundingMode(RoundingMode.CEILING);
+                    flare.setFlareDistance(Double.parseDouble(df.format(distance)));
                     listofFlares.add(flare);
                 }
             }
-            Collection
         }
     }
-    private double distance_between(Location l1, Location l2)
-    {
-        //http://stackoverflow.com/questions/18377587/android-distanceto-wrong-values
-        double lat1=l1.getLatitude();
-        double lon1=l1.getLongitude();
-        double lat2=l2.getLatitude();
-        double lon2=l2.getLongitude();
-        double R = 6371; // km
-        double dLat = (lat2-lat1)*Math.PI/180;
-        double dLon = (lon2-lon1)*Math.PI/180;
-        lat1 = lat1*Math.PI/180;
-        lat2 = lat2*Math.PI/180;
 
-        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        double d = R * c * 1000;
-
-        return d;
-    }
     private void signInAnonymously() {
         mAuth.signInAnonymously().addOnSuccessListener(this, new  OnSuccessListener<AuthResult>() {
             @Override

@@ -3,7 +3,9 @@ package com.example.hoodwatch.hoodwatch;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.Image;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
@@ -12,17 +14,29 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import test.jinesh.loadingviews.LoadingImageView;
-import test.jinesh.loadingviews.LoadingTextView;
+import java.util.ResourceBundle;
 
+import javax.crypto.spec.RC2ParameterSpec;
 
+import static android.support.v4.content.ContextCompat.startActivity;
+import static com.bumptech.glide.Glide.with;
 
 /**
  * Created by norman on 28/11/16.
@@ -35,24 +49,19 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
     private Context mContext;
     private StorageReference mStorageRef;
     public class MyViewHolder extends RecyclerView.ViewHolder{
-        public LoadingImageView iv;
-        public LoadingTextView tv_add;
-        public LoadingTextView tv;
-        public LoadingImageView  iv_icon;
+        public TextView tv, tv_add, tv_lat, tv_long, tv_distance;
+        public ImageView iv, iv_icon;
         public CardView cv;
 
 
         public MyViewHolder(View itemView) {
             super(itemView);
-            tv = (LoadingTextView) itemView.findViewById(R.id.tv_Post);
-            tv.startLoading();
-            iv = (LoadingImageView) itemView.findViewById(R.id.iv_image);
-            iv.startLoading();
+            tv = (TextView) itemView.findViewById(R.id.tv_Post);
+            iv = (ImageView) itemView.findViewById(R.id.iv_image);
             cv = (CardView) itemView.findViewById(R.id.flareCards);
-            tv_add = (LoadingTextView) itemView.findViewById(R.id.tv_address);
-            tv_add.startLoading();
-            iv_icon = (LoadingImageView) itemView.findViewById(R.id.iv_icon);
-            iv_icon.startLoading();
+            tv_add = (TextView) itemView.findViewById(R.id.tv_address);
+            iv_icon = (ImageView) itemView.findViewById(R.id.iv_icon);
+            tv_distance = (TextView) itemView.findViewById(R.id.tv_Distance);
             cv.setCardBackgroundColor(Color.WHITE);
         }
     }
@@ -66,25 +75,25 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         return new MyViewHolder(itemView);
     }
 
-
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
+
         Flare f = allFlares.get(position);
         holder.tv.setText(f.getflareText());
-        holder.tv.stopLoading();
         holder.tv.setTextSize(30);
         holder.tv.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
         holder.tv_add.setText(f.getAddress());
-        holder.tv_add.stopLoading();
-        mStorageRef = FirebaseStorage.getInstance().getReference();
+        holder.tv_distance.setText(Double.toString(f.getFlareDistance())+" metres");
+
+       mStorageRef = FirebaseStorage.getInstance().getReference();
 
         StorageReference imagesRef = mStorageRef.child(f.getImagename()+".jpg");
         imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 Log.i("firebase success img",uri.getPath());
+//                Picasso.with(mContext).load(uri).rotate(90).into(holder.iv);
                 Glide.with(mContext).load(uri).centerCrop().crossFade().into(holder.iv);
-                holder.iv.stopLoading();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -93,7 +102,6 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
                 Log.i("firebase error img ",exception.getMessage());
             }
         });
-        
 
         if(f.getType().equals("light")){
             holder.iv_icon.setImageResource(mContext.getResources().getIdentifier("cat1", "mipmap", mContext.getPackageName()));
@@ -104,7 +112,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         else{
             holder.iv_icon.setImageResource(mContext.getResources().getIdentifier("cat3", "mipmap", mContext.getPackageName()));
         }
-        holder.iv_icon.stopLoading();
+
         holder.cv.setOnClickListener(new myOwnClickListener(f, mContext));
     }
 
@@ -127,9 +135,16 @@ class myOwnClickListener implements View.OnClickListener
     public void onClick(View v)
     {
         Intent intent = new Intent(mContext, openFlare.class);
-        intent.putExtra("flare",f);
+        Log.d("address :", f.getAddress());
+        intent.putExtra("add", f.getAddress());
+        intent.putExtra("post", f.getflareText());
+        intent.putExtra("imagename", f.getImagename());
+        intent.putExtra("classification", f.getClassification());
+        intent.putExtra("lat", f.getLatitude());
+        intent.putExtra("long", f.getLongtitude());
+        intent.putExtra("distance", f.getFlareDistance());
+        intent.putExtra("flare", f);
         mContext.startActivity(intent);
-
     }
 
 
