@@ -93,7 +93,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
                 Log.i("firebase error img ",exception.getMessage());
             }
         });
-        
+
 
         if(f.getType().equals("light")){
             holder.iv_icon.setImageResource(mContext.getResources().getIdentifier("cat1", "mipmap", mContext.getPackageName()));

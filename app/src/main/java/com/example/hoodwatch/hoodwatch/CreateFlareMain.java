@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -15,6 +16,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -113,7 +115,7 @@ public class CreateFlareMain extends AppCompatActivity {
                 captureImage();
             }
         });
-
+        captureImage();
         // BootstrapCircleThumbnail thumb = (BootstrapCircleThumbnail) findViewById(R.id.thumb);
         ImageView thumb = (ImageView) findViewById(R.id.thumb);
         thumb.setOnClickListener(new View.OnClickListener() {
@@ -229,19 +231,6 @@ public class CreateFlareMain extends AppCompatActivity {
             }
         }
         return directory.getAbsolutePath();
-    }
-
-    private void loadImageFromStorage(String path) {
-
-        try {
-            File f = new File(path, imgName+".jpg");
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-            ImageView img = (ImageView) findViewById(R.id.upload);
-            img.setImageBitmap(b);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
     }
 
 
