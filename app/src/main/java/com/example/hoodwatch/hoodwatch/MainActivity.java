@@ -53,6 +53,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import io.github.yuweiguocn.lib.squareloading.SquareLoading;
+
 import static android.content.ContentValues.TAG;
 
 public class MainActivity extends Activity {
@@ -66,7 +68,7 @@ public class MainActivity extends Activity {
     ArrayList<Flare> listofFlares = new ArrayList<>();
     LocationManager lm;
     Location location;
-    ProgressBar pb;
+    SquareLoading sl;
     boolean permissionsAllowed = false;
     @Override
     protected void onResume() {
