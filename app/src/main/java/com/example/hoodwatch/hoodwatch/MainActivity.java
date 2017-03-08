@@ -146,7 +146,6 @@ public class MainActivity extends Activity {
                         ValueEventListener pl = new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
 
                                 allFlares.clear();
                                 listofFlares.clear();
@@ -154,15 +153,8 @@ public class MainActivity extends Activity {
                                     maxSize = (int)child.getChildrenCount();
 //                                    for(DataSnapshot children: child.getChildren()){
                                         Flare flare = child.getValue(Flare.class);
-                                        try {
-                                            List<android.location.Address> list  = geocoder.getFromLocation(flare.getLatitude(),flare.getLongtitude(),1);
-                                            if(list.size() != 0) {
-                                                flare.setAddress(list.get(0).getAddressLine(0));
-                                            }
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                        
+
+
                                         allFlares.add(flare);
                                         geoList.add(new Geofence.Builder()
                                                 .setRequestId(flare.getFlareID())

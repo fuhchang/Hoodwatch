@@ -47,7 +47,7 @@ public class openFlare extends AppCompatActivity {
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        StorageReference imagesRef = mStorageRef.child(flare.getImagename() +".jpg");
+        StorageReference imagesRef = mStorageRef.child(flare.getImagename());
         imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {

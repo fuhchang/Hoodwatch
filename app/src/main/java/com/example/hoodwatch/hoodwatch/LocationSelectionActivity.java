@@ -6,11 +6,16 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -32,10 +37,19 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import static com.example.hoodwatch.hoodwatch.R.mipmap.flare;
 
@@ -45,18 +59,25 @@ public class LocationSelectionActivity extends FragmentActivity implements OnMap
     double lat;
     double lng;
     String imgName;
+    Uri imageUri;
     Marker marker;
     Circle circle;
     Flare flare;
     private DatabaseReference mDatabase;
+    private StorageReference mStorageRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_selection);
         Bundle bundle = getIntent().getExtras();
         flare = (Flare) getIntent().getSerializableExtra("flare");
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        if(bundle != null && bundle.containsKey("imageUri")){
+            imageUri = (Uri) bundle.get("imageUri");
+            Log.d("img path", imageUri.toString());
+        }
 
+        mDatabase = FirebaseDatabase.getInstance().getReference().push();
+        mStorageRef = FirebaseStorage.getInstance().getReference();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
@@ -85,7 +106,15 @@ public class LocationSelectionActivity extends FragmentActivity implements OnMap
                         .title("Hazard location"));
                 flare.setLatitude(latLng.latitude);
                 flare.setLongtitude(latLng.longitude);
-
+                Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                try {
+                    List<Address> list  = geocoder.getFromLocation(flare.getLatitude(),flare.getLongtitude(),1);
+                    if(list.size() != 0) {
+                        flare.setAddress(list.get(0).getAddressLine(0));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                                 new PanterDialog(LocationSelectionActivity.this)
                                         .setHeaderBackground(R.color.colorPrimary)
                                         .setHeaderLogo(R.mipmap.ic_launcher)
@@ -104,13 +133,35 @@ public class LocationSelectionActivity extends FragmentActivity implements OnMap
                                                                     flare.setType("light");
                                                                 }else if(text.equals("hazard level 2")){
                                                                     flare.setType("mid");
-                                                                }else if(text.equals("hazard level 2")){
+                                                                }else if(text.equals("hazard level 3")){
                                                                     flare.setType("heavy");
                                                                 }
-                                                                mDatabase.child(flare.getImagename()).setValue(flare);
-                                                                Intent intent = new Intent(LocationSelectionActivity.this, MainActivity.class);
-                                                                startActivity(intent);
-                                                                finish();
+                                                                mDatabase.setValue(flare);
+                                                                flare.setImagename(mDatabase.getKey()+".jpg");
+                                                                flare.setFlareID(mDatabase.getKey());
+                                                                mDatabase.setValue(flare);
+                                                                StorageReference imgRef = mStorageRef.child(flare.getImagename());
+                                                                UploadTask uploadTask = imgRef.putFile(imageUri);
+                                                                uploadTask.addOnFailureListener(new OnFailureListener() {
+                                                                    @Override
+                                                                    public void onFailure(@NonNull Exception e) {
+                                                                        Toast.makeText(getApplicationContext(),"failed",Toast.LENGTH_LONG).show();
+                                                                    }
+                                                                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                                    @Override
+                                                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                                        Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_LONG).show();
+                                                                        Intent intent = new Intent(LocationSelectionActivity.this, MainActivity.class);
+                                                                        startActivity(intent);
+                                                                        finish();
+                                                                    }
+                                                                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                                                    @Override
+                                                                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+
+                                                                    }
+                                                                });
+
                                                             }
                                                         })
                                                         .show();

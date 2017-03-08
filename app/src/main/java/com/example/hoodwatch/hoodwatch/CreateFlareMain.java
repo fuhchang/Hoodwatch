@@ -83,15 +83,7 @@ public class CreateFlareMain extends AppCompatActivity {
         setContentView(R.layout.activity_create_flare_main);
         TypefaceProvider.registerDefaultIconSets();
         Bundle bundle = getIntent().getExtras();
-
-        maxcount = bundle.getInt("maxcount");
         username = bundle.getString("username");
-        imgName = "Image" + (maxcount + 1);
-        // get reference to 'users' node
-
-
-        // store app title to 'app_title' node
-
         RelativeLayout rl = (RelativeLayout) findViewById(R.id.activity_create_flare_main);
         rl.setBackgroundColor(Color.WHITE);
 
@@ -238,9 +230,6 @@ public class CreateFlareMain extends AppCompatActivity {
     private void createFlare() {
         ByteArrayOutputStream fos = new ByteArrayOutputStream();
         Flare flare = new Flare();
-        System.out.println("img " + imgName);
-        flare.setFlareID(imgName);
-        flare.setImagename(imgName);
         EditText text = (EditText) findViewById(R.id.msg);
         flare.setflareText(text.getText().toString());
         flare.setUserName(username);
@@ -255,39 +244,16 @@ public class CreateFlareMain extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        flare.setType("mid");
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child(imgName).setValue(flare);
+
         Bitmap bitmap = Bitmap.createBitmap(img.getDrawingCache());
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
         if (fos != null) {
             imgData = fos.toByteArray();
         }
-        mStorageRef = FirebaseStorage.getInstance().getReference();
-        StorageReference mountainsRef = mStorageRef.child(imgName+".jpg");
-        if(imgData != null){
-            Toast.makeText(getApplicationContext(), "not null", Toast.LENGTH_SHORT).show();
-            UploadTask uploadTask = mountainsRef.putFile(imageUri);
-            uploadTask.addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle unsuccessful uploads
-                    Toast.makeText(getApplicationContext(),"failed",Toast.LENGTH_LONG).show();
-                }
-            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                    Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_LONG).show();
-
-                }
-            });
-        }else{
-            Toast.makeText(getApplicationContext(), "is null", Toast.LENGTH_SHORT).show();
-        }
         Intent intent = new Intent(CreateFlareMain.this, LocationSelectionActivity.class);
         intent.putExtra("flare",flare);
+        intent.putExtra("imageUri", imageUri);
         startActivity(intent);
         finish();
     }
@@ -331,8 +297,4 @@ public class CreateFlareMain extends AppCompatActivity {
         }
     }
 
-    public void selectLoc(){
-        Intent intent = new Intent(this,LocationSelectionActivity.class);
-        startActivity(intent);
-    }
 }
