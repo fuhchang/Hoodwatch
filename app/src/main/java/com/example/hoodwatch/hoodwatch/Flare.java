@@ -37,6 +37,7 @@ public class Flare implements Serializable {
     private String userName;
     private String address;
     private Double latitude, longtitude;
+    private String hideFrom;
     private long time;
     private String type;
     private Uri uri;
@@ -50,6 +51,7 @@ public class Flare implements Serializable {
         latitude = 0.0;
         longtitude = 0.0;
         time = 0L;
+        hideFrom = "";
     }
 
 
@@ -149,5 +151,19 @@ public class Flare implements Serializable {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getHideFrom() {
+        return hideFrom;
+    }
+
+    public void setHideFrom(String hideFrom) {
+        if(this.hideFrom != ""){
+            this.hideFrom = this.hideFrom + "," + hideFrom;
+        }
+        else{
+            this.hideFrom = hideFrom;
+        }
+
     }
 }

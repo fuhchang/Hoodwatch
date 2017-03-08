@@ -1,6 +1,7 @@
 package com.example.hoodwatch.hoodwatch;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
+import com.eminayar.panter.PanterDialog;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -24,22 +26,20 @@ import test.jinesh.loadingviews.LoadingTextView;
 
 
 
-/**
- * Created by norman on 28/11/16.
- */
-
 
 public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder> {
 
     private List<Flare> allFlares = new ArrayList<>();
     private Context mContext;
     private StorageReference mStorageRef;
+    private Flare flare1;
     public class MyViewHolder extends RecyclerView.ViewHolder{
         public LoadingImageView iv;
-        public LoadingTextView tv_add;
+        public LoadingTextView tv_add, tv_hide;
         public LoadingTextView tv;
         public LoadingImageView  iv_icon;
         public CardView cv;
+        public LoadingTextView tv_distance;
 
 
         public MyViewHolder(View itemView) {
@@ -53,6 +53,8 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             tv_add.startLoading();
             iv_icon = (LoadingImageView) itemView.findViewById(R.id.iv_icon);
             iv_icon.startLoading();
+            tv_distance = (LoadingTextView) itemView.findViewById(R.id.tv_Distance);
+            tv_hide = (LoadingTextView) itemView.findViewById(R.id.tv_hide);
             cv.setCardBackgroundColor(Color.WHITE);
         }
     }
@@ -66,16 +68,22 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         return new MyViewHolder(itemView);
     }
 
-
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
-        Flare f = allFlares.get(position);
-        holder.tv.setText(f.getflareText());
-        holder.tv.stopLoading();
-        holder.tv.setTextSize(30);
-        holder.tv.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
+        final Flare f = allFlares.get(position);
+        flare1 = f;
+        try {
+            holder.tv.setText(f.getflareText());
+            holder.tv.stopLoading();
+            holder.tv.setTextSize(30);
+            holder.tv.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
+        }
+        catch (Exception e){
+            holder.tv.setText("");
+        }
         holder.tv_add.setText(f.getAddress());
         holder.tv_add.stopLoading();
+        holder.tv_distance.setText(Double.toString(f.getFlareDistance())+" metres");
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
         StorageReference imagesRef = mStorageRef.child(f.getImagename());
@@ -106,6 +114,27 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         }
         holder.iv_icon.stopLoading();
         holder.cv.setOnClickListener(new myOwnClickListener(f, mContext));
+
+        final PanterDialog pd = new PanterDialog(mContext);
+        pd.setPositive("Yes", new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+
+                f.setHideFrom(f.getUserName());
+                pd.dismiss();
+            }
+        })// You can pass also View.OnClickListener as second param
+                .setNegative("DISMISS")
+                .setMessage("Do you want to hide this flare?")
+                .isCancelable(false);
+        holder.tv_hide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pd.show();
+            }
+        });
+
+
     }
 
     @Override

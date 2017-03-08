@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,11 +49,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.IOException;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -63,8 +62,7 @@ import io.github.yuweiguocn.lib.squareloading.SquareLoading;
 import static android.content.ContentValues.TAG;
 
 public class MainActivity extends Activity {
-    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS= 2;
-    String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+
     GoogleApiClient googleApiClient = null;
 
     private DatabaseReference mPostReference;
@@ -198,7 +196,7 @@ public class MainActivity extends Activity {
                                 Collections.sort(allFlares, new Comparator<Flare>() {
                                     @Override
                                     public int compare(Flare flare, Flare t1) {
-                                        return (Integer.parseInt(flare.getFlareID().substring(flare.getFlareID().indexOf("e")+1, flare.getFlareID().length())) > Integer.parseInt(t1.getFlareID().substring(t1.getFlareID().indexOf("e")+1, t1.getFlareID().length()))) ? -1: (Integer.parseInt(flare.getFlareID().substring(flare.getFlareID().indexOf("e")+1, flare.getFlareID().length())) > Integer.parseInt(t1.getFlareID().substring(t1.getFlareID().indexOf("e")+1, t1.getFlareID().length()))) ? 1:0 ;
+                                        return flare.getTime() > t1.getTime() ? -1: flare.getTime() < t1.getTime()  ? 1:0 ;
                                     }
                                 });
                                 myFab.setOnClickListener((new View.OnClickListener(){
@@ -214,12 +212,9 @@ public class MainActivity extends Activity {
                                     }
                                 }));
 
-
                                 if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                     location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-                                    if (location == null) {
-                                    }
-                                    else{
+                                    if (location != null) {
                                         lm = (LocationManager) getSystemService(MainActivity.LOCATION_SERVICE);
                                         android.location.LocationListener locationlistener = new android.location.LocationListener() {
                                             @Override
@@ -352,18 +347,16 @@ public class MainActivity extends Activity {
             startLocationMonitoring();
             double longitude = location.getLongitude();
             double latitude = location.getLatitude();
-            System.out.println(location.getLongitude() + " : "+ location.getLatitude());
             Location locationA = new Location("point A");
             locationA.setLongitude(longitude);
             locationA.setLatitude(latitude);
             Location locationB = new Location("point B");
             for (Flare flare : allFlares) {
-
                 locationB.setLatitude(flare.getLatitude());
                 locationB.setLongitude(flare.getLongtitude());
                 double distance = location.distanceTo(locationB);
-                System.out.println("Distance : " + distance);
-                if (distance < 500) {
+                System.out.println(flare.getFlareID());
+                if (distance < 5000 && !flare.getHideFrom().contains(flare.getUserName())) {
                     DecimalFormat df = new DecimalFormat("#.#");
                     df.setRoundingMode(RoundingMode.CEILING);
                     flare.setFlareDistance(Double.parseDouble(df.format(distance)));
@@ -371,7 +364,6 @@ public class MainActivity extends Activity {
                 }
             }
         }
-
     }
 
     private void signInAnonymously() {
@@ -389,106 +381,6 @@ public class MainActivity extends Activity {
                 });
     }
 
-    /*
-    private int loadCSV(){
-        BufferedReader reader = null;
-        Geocoder geocoder = new Geocoder(getBaseContext());
-        try {
-
-            reader = new BufferedReader(new FileReader(new File("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/flares.csv")));
-            String csvLine;
-            int count=0;
-            ArrayList<String[]> allRows = new ArrayList<>();
-            while ((csvLine = reader.readLine()) != null) {
-
-                String[] row = csvLine.split(",");
-                allRows.add(count,row);
-                count++;
-            }
-            reader.close();
-            allFlares.clear();
-            geoList.clear();
-            Log.d("count: ", String.valueOf(count));
-            for(int i=0 ; i < count; i++){
-                String[] row = allRows.get(count-(i+1));
-                Flare f = new Flare();
-                f.setFlareID(row[0]);
-                f.setImagename(row[1]);
-                f.setFlareText(row[2]);
-                f.setClassification(row[3]);
-                f.setUserName(row[4]);
-                f.setLatitude(Double.parseDouble(row[5]));
-                f.setLongtitude(Double.parseDouble(row[6]));
-                f.setTime(Long.parseLong(row[7]));
-                List<android.location.Address> list = geocoder.getFromLocation(f.getLatitude(),f.getLongtitude(),3);
-                f.setAddress(String.valueOf(list.get(0).getAddressLine(0)));
-                allFlares.add(f);
-                geoList.add(new Geofence.Builder()
-                        .setRequestId(allFlares.get(i).getFlareID())
-                        .setCircularRegion(allFlares.get(i).getLatitude(), allFlares.get(i).getLongtitude(), 100)
-                        .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT| Geofence.GEOFENCE_TRANSITION_DWELL)
-                        .setLoiteringDelay(1000)
-                        .setNotificationResponsiveness(1000)
-                        .build());
-            }
-            GeofencingRequest gfRequest = new GeofencingRequest.Builder()
-                    .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER).addGeofences(geoList)
-                    .build();
-            Intent intent = new Intent(this, GeofenceService.class);
-            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-            if (!googleApiClient.isConnected()) {
-                Log.d(TAG, "google api Client is not connected");
-            } else {
-                boolean check = false;
-                if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    System.out.println("hello world");
-                    if(ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                        ActivityCompat.requestPermissions(MainActivity.this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},0);
-                        check = true;
-                    }else{
-                        check =false;
-                    }
-                    if(ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                        ActivityCompat.requestPermissions(MainActivity.this,new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},0);
-                        check = true;
-                    }else{
-                        check =false;
-                    }
-
-                    if(check==false){
-                        Log.d("geofence", "failed to allow geofence");
-                    }
-
-                }
-                LocationServices.GeofencingApi.addGeofences(googleApiClient, gfRequest, pendingIntent).setResultCallback(new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(@NonNull Status status) {
-                        if(status.isSuccess()){
-                            Log.d(TAG,"successfully added geofence");
-
-                        }else{
-                            Log.d(TAG,"failed to add geofence " + status.getStatus());
-                        }
-                    }
-                });
-            }
-            return count;
-        }
-        catch (Exception e) {
-
-        }
-        return 0;
-    }
-*/
     @Override
     protected void onStart() {
         super.onStart();
@@ -500,5 +392,4 @@ public class MainActivity extends Activity {
         super.onStop();
         googleApiClient.disconnect();
     }
-
 }
