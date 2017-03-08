@@ -162,6 +162,7 @@ public class MainActivity extends Activity {
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
+                                        
                                         allFlares.add(flare);
                                         geoList.add(new Geofence.Builder()
                                                 .setRequestId(flare.getFlareID())
