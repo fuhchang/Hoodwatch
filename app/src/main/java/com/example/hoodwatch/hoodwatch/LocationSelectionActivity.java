@@ -107,7 +107,7 @@ public class LocationSelectionActivity extends FragmentActivity implements OnMap
                                                                 }else if(text.equals("hazard level 2")){
                                                                     flare.setType("heavy");
                                                                 }
-                                                                mDatabase.child("event").child(flare.getImagename()).setValue(flare);
+                                                                mDatabase.child(flare.getImagename()).setValue(flare);
                                                                 Intent intent = new Intent(LocationSelectionActivity.this, MainActivity.class);
                                                                 startActivity(intent);
                                                                 finish();
