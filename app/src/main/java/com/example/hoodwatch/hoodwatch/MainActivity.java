@@ -15,7 +15,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -69,7 +68,6 @@ public class MainActivity extends Activity {
     GoogleApiClient googleApiClient = null;
 
     private DatabaseReference mPostReference;
-    private StorageReference mStorageRef;
     int maxSize =0;
     ArrayList<Geofence> geoList = new ArrayList<>();
     ArrayList<Flare> listofFlares = new ArrayList<>();
@@ -103,9 +101,9 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         rv = (RecyclerView) findViewById(R.id.rv_main);
         rv.setHasFixedSize(false);
+        sl = (SquareLoading) findViewById(R.id.SquareLoading);
 
         mPostReference = FirebaseDatabase.getInstance().getReference();
-        mStorageRef = FirebaseStorage.getInstance().getReference();
         adapter = new flareAdapter(this, listofFlares);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         rv.setLayoutManager(mLayoutManager);
@@ -140,7 +138,7 @@ public class MainActivity extends Activity {
         } else {
             signInAnonymously();
         }
-        Geocoder geocoder = new Geocoder(getBaseContext());
+
         geoList.clear();
 
         googleApiClient = new GoogleApiClient.Builder(this)
@@ -182,13 +180,8 @@ public class MainActivity extends Activity {
                                     maxSize = (int)child.getChildrenCount();
 //                                    for(DataSnapshot children: child.getChildren()){
                                         Flare flare = child.getValue(Flare.class);
-                                        try {
-                                                List<android.location.Address> list = geocoder.getFromLocation(flare.getLatitude(), flare.getLongtitude(), 1);
-                                                String a = list.get(0).getAddressLine(0);
-                                                flare.setAddress(a);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
+
+
                                         allFlares.add(flare);
                                         geoList.add(new Geofence.Builder()
                                                 .setRequestId(flare.getFlareID())
@@ -269,7 +262,6 @@ public class MainActivity extends Activity {
                                                     //                                          int[] grantResults)
                                                     // to handle the case where the user grants the permission. See the documentation
                                                     // for ActivityCompat#requestPermissions for more details.
-                                                    System.out.println("hello world");
                                                     if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                                                         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
                                                         check = true;
@@ -301,6 +293,9 @@ public class MainActivity extends Activity {
                                                 });
                                             }
                                             changelist();
+                                            if(sl.VISIBLE != View.GONE){
+                                                sl.setVisibility(View.GONE);
+                                            }
                                             adapter.notifyDataSetChanged();
                                         }
                                     }
@@ -357,6 +352,7 @@ public class MainActivity extends Activity {
             startLocationMonitoring();
             double longitude = location.getLongitude();
             double latitude = location.getLatitude();
+            System.out.println(location.getLongitude() + " : "+ location.getLatitude());
             Location locationA = new Location("point A");
             locationA.setLongitude(longitude);
             locationA.setLatitude(latitude);
@@ -366,6 +362,7 @@ public class MainActivity extends Activity {
                 locationB.setLatitude(flare.getLatitude());
                 locationB.setLongitude(flare.getLongtitude());
                 double distance = location.distanceTo(locationB);
+                System.out.println("Distance : " + distance);
                 if (distance < 500) {
                     DecimalFormat df = new DecimalFormat("#.#");
                     df.setRoundingMode(RoundingMode.CEILING);
@@ -374,6 +371,7 @@ public class MainActivity extends Activity {
                 }
             }
         }
+
     }
 
     private void signInAnonymously() {

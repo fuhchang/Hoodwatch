@@ -78,7 +78,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         holder.tv_add.stopLoading();
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        StorageReference imagesRef = mStorageRef.child(f.getImagename()+".jpg");
+        StorageReference imagesRef = mStorageRef.child(f.getImagename());
         imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {

@@ -5,21 +5,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.bumptech.glide.Glide;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.vision.Frame;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import test.jinesh.loadingviews.LoadingImageView;
@@ -29,9 +21,8 @@ import test.jinesh.loadingviews.LoadingTextView;
  * Created by norman on 29/11/16.
  */
 
-public class openFlare extends AppCompatActivity implements OnMapReadyCallback {
+public class openFlare extends AppCompatActivity {
     Intent intent;
-    Flare flare = null;
     private StorageReference mStorageRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,43 +58,42 @@ public class openFlare extends AppCompatActivity implements OnMapReadyCallback {
 
             mStorageRef = FirebaseStorage.getInstance().getReference();
 
-            StorageReference imagesRef = mStorageRef.child(flare.getImagename() + ".jpg");
-            imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    Log.i("firebase success img", uri.getPath());
-                    Glide.with(getApplication()).load(uri).centerCrop().crossFade().into(iv_image);
-                    iv_image.stopLoading();
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle any errors
-                    Log.i("firebase error img ", exception.getMessage());
-                }
-            });
-            Log.d("class", flare.getClassification());
-            if (flare.getClassification().equals("light")) {
-                iv_icon.setImageResource(this.getResources().getIdentifier("cat1", "mipmap", this.getPackageName()));
-            } else if (flare.getClassification().equals("mid")) {
-                iv_icon.setImageResource(this.getResources().getIdentifier("cat2", "mipmap", this.getPackageName()));
-            } else {
-                iv_icon.setImageResource(this.getResources().getIdentifier("cat3", "mipmap", this.getPackageName()));
+        StorageReference imagesRef = mStorageRef.child(flare.getImagename());
+        imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Log.i("firebase success img",uri.getPath());
+                Glide.with(getApplication()).load(uri).centerCrop().crossFade().into(iv_image);
+                iv_image.stopLoading();
             }
-            iv_icon.stopLoading();
-            //tv_add.setOnClickListener(new onClickopenFrag(bundle.getLong("lat"), bundle.getLong("long"), this));
-            tv_add.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(openFlare.this, MapActivity.class);
-                    intent.putExtra("lat", flare.getLatitude());
-                    intent.putExtra("long", flare.getLongtitude());
-                    startActivity(intent);
-                }
-            });
-            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-            mapFragment.getMapAsync(this);
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Log.i("firebase error img ",exception.getMessage());
+            }
+        });
+        Log.d("class", flare.getClassification());
+        if(flare.getClassification().equals("light")){
+            iv_icon.setImageResource(this.getResources().getIdentifier("cat1", "mipmap", this.getPackageName()));
         }
+        else if(flare.getClassification().equals("mid")){
+            iv_icon.setImageResource(this.getResources().getIdentifier("cat2", "mipmap", this.getPackageName()));
+        }
+        else{
+            iv_icon.setImageResource(this.getResources().getIdentifier("cat3", "mipmap", this.getPackageName()));
+        }
+        iv_icon.stopLoading();
+        //tv_add.setOnClickListener(new onClickopenFrag(bundle.getLong("lat"), bundle.getLong("long"), this));
+        tv_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(openFlare.this,MapActivity.class);
+                intent.putExtra("lat",flare.getLatitude());
+                intent.putExtra("long",flare.getLongtitude());
+                startActivity(intent);
+            }
+        });
     }
     @Override
     public void onMapReady(GoogleMap map) {
