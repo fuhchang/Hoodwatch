@@ -23,6 +23,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -58,6 +59,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import io.github.yuweiguocn.lib.squareloading.SquareLoading;
+
 import static android.content.ContentValues.TAG;
 
 public class MainActivity extends Activity {
@@ -72,6 +75,7 @@ public class MainActivity extends Activity {
     ArrayList<Flare> listofFlares = new ArrayList<>();
     LocationManager lm;
     Location location;
+    SquareLoading sl;
     boolean permissionsAllowed = false;
     @Override
     protected void onResume() {
@@ -99,6 +103,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         rv = (RecyclerView) findViewById(R.id.rv_main);
         rv.setHasFixedSize(false);
+
         mPostReference = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         adapter = new flareAdapter(this, listofFlares);
@@ -175,8 +180,8 @@ public class MainActivity extends Activity {
                                 listofFlares.clear();
                                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                                     maxSize = (int)child.getChildrenCount();
-                                    for(DataSnapshot children: child.getChildren()){
-                                        Flare flare = children.getValue(Flare.class);
+//                                    for(DataSnapshot children: child.getChildren()){
+                                        Flare flare = child.getValue(Flare.class);
                                         try {
                                                 List<android.location.Address> list = geocoder.getFromLocation(flare.getLatitude(), flare.getLongtitude(), 1);
                                                 String a = list.get(0).getAddressLine(0);
@@ -194,7 +199,7 @@ public class MainActivity extends Activity {
                                                 .setNotificationResponsiveness(1000)
                                                 .build());
 
-                                    }
+//                                    }
 
                                 }
                                 Collections.sort(allFlares, new Comparator<Flare>() {

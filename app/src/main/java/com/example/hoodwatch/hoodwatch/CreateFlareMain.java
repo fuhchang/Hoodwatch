@@ -49,10 +49,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -203,35 +199,6 @@ public class CreateFlareMain extends AppCompatActivity {
         }
     }
 
-    
-    private String saveToInternalStorage(Bitmap bitmapImage, String imgName) {
-        ContextWrapper cw = new ContextWrapper(getApplicationContext());
-        // path to /data/data/yourapp/app_data/imageDir
-        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-        // Create imageDir
-        path = directory.getPath();
-        File mypath = new File(directory, imgName + ".jpg");
-        Log.d("path", path);
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(mypath);
-            Log.d("image", "The path is " + path);
-            // Use the compress method on the BitMap object to write image to the OutputStream
-            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return directory.getAbsolutePath();
-    }
-
-
     @Override
     public void onStart() {
         super.onStart();// ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -291,7 +258,7 @@ public class CreateFlareMain extends AppCompatActivity {
         flare.setType("mid");
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("event").child(imgName).setValue(flare);
+        mDatabase.child(imgName).setValue(flare);
         Bitmap bitmap = Bitmap.createBitmap(img.getDrawingCache());
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
         if (fos != null) {
