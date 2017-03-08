@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -15,6 +16,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -85,12 +87,10 @@ public class CreateFlareMain extends AppCompatActivity {
         setContentView(R.layout.activity_create_flare_main);
         TypefaceProvider.registerDefaultIconSets();
         Bundle bundle = getIntent().getExtras();
-        type = bundle.getString("type");
+
         maxcount = bundle.getInt("maxcount");
         username = bundle.getString("username");
-        System.out.println("count " + maxcount);
         imgName = "Image" + (maxcount + 1);
-        System.out.println("image "+ imgName);
         // get reference to 'users' node
 
 
@@ -113,7 +113,7 @@ public class CreateFlareMain extends AppCompatActivity {
                 captureImage();
             }
         });
-
+        captureImage();
         // BootstrapCircleThumbnail thumb = (BootstrapCircleThumbnail) findViewById(R.id.thumb);
         ImageView thumb = (ImageView) findViewById(R.id.thumb);
         thumb.setOnClickListener(new View.OnClickListener() {
@@ -231,19 +231,6 @@ public class CreateFlareMain extends AppCompatActivity {
         return directory.getAbsolutePath();
     }
 
-    private void loadImageFromStorage(String path) {
-
-        try {
-            File f = new File(path, imgName+".jpg");
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-            ImageView img = (ImageView) findViewById(R.id.upload);
-            img.setImageBitmap(b);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-    }
-
 
     @Override
     public void onStart() {
@@ -301,7 +288,7 @@ public class CreateFlareMain extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        flare.setType(type);
+        flare.setType("mid");
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mDatabase.child("event").child(imgName).setValue(flare);
@@ -332,7 +319,8 @@ public class CreateFlareMain extends AppCompatActivity {
         }else{
             Toast.makeText(getApplicationContext(), "is null", Toast.LENGTH_SHORT).show();
         }
-        Intent intent = new Intent(CreateFlareMain.this, MainActivity.class);
+        Intent intent = new Intent(CreateFlareMain.this, LocationSelectionActivity.class);
+        intent.putExtra("flare",flare);
         startActivity(intent);
         finish();
     }
@@ -374,5 +362,10 @@ public class CreateFlareMain extends AppCompatActivity {
         } else {
             Log.d("camera", "no camera");
         }
+    }
+
+    public void selectLoc(){
+        Intent intent = new Intent(this,LocationSelectionActivity.class);
+        startActivity(intent);
     }
 }

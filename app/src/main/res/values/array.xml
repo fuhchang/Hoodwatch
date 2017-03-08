@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="choices">
+        <item>hazard level 1</item>
+        <item>hazard level 2</item>
+        <item>hazard level 3</item>
+    </array>
+</resources>
