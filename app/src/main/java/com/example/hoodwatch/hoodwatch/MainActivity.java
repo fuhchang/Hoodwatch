@@ -96,6 +96,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         rv = (RecyclerView) findViewById(R.id.rv_main);
         rv.setHasFixedSize(false);
+        sl = (SquareLoading) findViewById(R.id.SquareLoading);
 
         mPostReference = FirebaseDatabase.getInstance().getReference();
         adapter = new flareAdapter(this, listofFlares);
@@ -268,6 +269,9 @@ public class MainActivity extends Activity {
                                                 });
                                             }
                                             changelist();
+                                            if(sl.VISIBLE != View.GONE){
+                                                sl.setVisibility(View.GONE);
+                                            }
                                             adapter.notifyDataSetChanged();
                                         }
                                     }
@@ -342,6 +346,7 @@ public class MainActivity extends Activity {
             }
 
         }
+
     }
     private double distance_between(Location l1, Location l2)
     {
