@@ -156,6 +156,7 @@ public class LocationSelectionActivity extends FragmentActivity implements OnMap
                                                                         Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_LONG).show();
                                                                         Intent intent = new Intent(LocationSelectionActivity.this, MainActivity.class);
                                                                         startActivity(intent);
+                                                                        sl.setVisibility(View.GONE);
                                                                         finish();
                                                                     }
                                                                 }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {

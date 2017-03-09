@@ -104,6 +104,7 @@ public class MainActivity extends Activity {
 
         mPostReference = FirebaseDatabase.getInstance().getReference();
         adapter = new flareAdapter(this, listofFlares);
+
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         rv.setLayoutManager(mLayoutManager);
         rv.setItemAnimator(new DefaultItemAnimator());
