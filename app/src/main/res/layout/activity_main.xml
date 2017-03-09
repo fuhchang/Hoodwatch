@@ -44,7 +44,8 @@
         android:id="@+id/addFlare"
         app:layout_anchorGravity="bottom|center_horizontal"
         android:layout_gravity="bottom|right"
-        app:backgroundTint="@android:color/holo_red_light" />
+        app:backgroundTint="@android:color/holo_blue_dark"
+        android:tint="@android:color/white"/>
 
     <include layout="@layout/content_main"
         android:layout_width="match_parent"
