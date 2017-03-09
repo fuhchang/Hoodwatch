@@ -109,7 +109,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             }
         });
 
-
+        
         if(f.getType().equals("light")){
             holder.iv_icon.setImageResource(mContext.getResources().getIdentifier("cat1", "mipmap", mContext.getPackageName()));
         }
@@ -163,6 +163,7 @@ class myOwnClickListener implements View.OnClickListener
     @Override
     public void onClick(View v)
     {
+
         Intent intent = new Intent(mContext, ViewFlare.class);
         intent.putExtra("flare",f);
         mContext.startActivity(intent);
