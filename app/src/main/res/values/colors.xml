@@ -8,4 +8,5 @@
     <color name="colorMedium">#fffa00</color>
     <color name="colorHeavy">#ee0000</color>
     <color name="colorText">#332255</color>
+    <color name="colorGrey">#f9f9f9</color>
 </resources>

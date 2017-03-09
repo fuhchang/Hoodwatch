@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="icons">
+        <item>@mipmap/cat1</item>
+        <item>@mipmap/cat2</item>
+        <item>@mipmap/cat3</item>
+    </string-array>
+    <string-array name="choices">
+        <item>Not Dangerous</item>
+        <item>Mildly Dangerous</item>
+        <item>Highly Dangerous</item>
+    </string-array>
+    <string-array name="iconchoice">
+        <item>
+            <icons>@mipmap/cat1</icons>
+            <texts>(Not Dangerous)</texts>
+        </item>
+        <item>
+            <icons>@mipmap/cat2</icons>
+            <texts>(Mildly Dangerous)</texts>
+        </item>
+        <item>
+            <icons>@mipmap/cat2</icons>
+            <texts>(Highly Dangerous)</texts>
+        </item>
+    </string-array>
+</resources>

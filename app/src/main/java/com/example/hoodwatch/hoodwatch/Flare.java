@@ -2,6 +2,7 @@ package com.example.hoodwatch.hoodwatch;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -11,11 +12,35 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 
 public class Flare implements Serializable {
-    private String flareID, imagename,flareText, classification, userName, address;
+    private String flareID;
+    private String imagename;
+
+    public double getFlareDistance() {
+        return flareDistance;
+    }
+
+    public void setFlareDistance(double flareDistance) {
+        this.flareDistance = flareDistance;
+    }
+
+    private double flareDistance;
+    public void setflareText(String flareText) {
+        this.flareText = flareText;
+    }
+
+    public String getflareText() {
+        return flareText;
+    }
+
+    private String flareText;
+    private String classification;
+    private String userName;
+    private String address;
     private Double latitude, longtitude;
+    private String hideFrom;
     private long time;
     private String type;
-
+    private Uri uri;
     public Flare(){
         flareID = "";
         imagename = "";
@@ -26,6 +51,16 @@ public class Flare implements Serializable {
         latitude = 0.0;
         longtitude = 0.0;
         time = 0L;
+        hideFrom = "";
+    }
+
+
+    public Uri getUri() {
+        return uri;
+    }
+
+    public void setUri(Uri uri) {
+        this.uri = uri;
     }
 
     public String getFlareID() {
@@ -44,13 +79,6 @@ public class Flare implements Serializable {
         this.imagename = imagename;
     }
 
-    protected String getFlareText() {
-        return flareText;
-    }
-
-    protected void setFlareText(String flareText) {
-        this.flareText = flareText;
-    }
 
     public String getClassification() {
         return classification;
@@ -123,5 +151,19 @@ public class Flare implements Serializable {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getHideFrom() {
+        return hideFrom;
+    }
+
+    public void setHideFrom(String hideFrom) {
+        if(this.hideFrom != null){
+            this.hideFrom = this.hideFrom + "," + hideFrom;
+        }
+        else{
+            this.hideFrom = hideFrom;
+        }
+
     }
 }

@@ -32,7 +32,7 @@
         android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="false"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/icon2"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:supportsRtl="true"
@@ -49,16 +49,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".CreateFlareType"></activity>
-        <activity android:name=".CreateFlareMain"></activity>
-        <activity android:name=".openFlare"></activity>
+        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".CreateFlareType" />
+        <activity android:name=".CreateFlareMain" />
+        <activity android:name=".openFlare" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -68,7 +62,15 @@
             android:name=".MapFragment"
             android:label="@string/title_activity_map_fragment"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".MapActivity"></activity>
+        <activity android:name=".MapActivity" />
+        <activity android:name=".SplashScreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".LocationSelectionActivity"></activity>
     </application>
 
 </manifest>

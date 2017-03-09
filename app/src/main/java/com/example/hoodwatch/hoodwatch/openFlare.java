@@ -1,82 +1,121 @@
 package com.example.hoodwatch.hoodwatch;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.content.Context;
+
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import com.beardedhen.androidbootstrap.BootstrapWell;
 import com.beardedhen.androidbootstrap.TypefaceProvider;
+import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.vision.Frame;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import test.jinesh.loadingviews.LoadingImageView;
+import test.jinesh.loadingviews.LoadingTextView;
 
 /**
  * Created by norman on 29/11/16.
  */
 
-public class openFlare extends AppCompatActivity {
+public class openFlare extends AppCompatActivity implements OnMapReadyCallback {
     Intent intent;
-    double lat;
-    double lng;
+    Flare flare = null;
+    private StorageReference mStorageRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_open_flare);
         TypefaceProvider.registerDefaultIconSets();
 
-        Bundle bundle = getIntent().getExtras();
-        String address = bundle.getString("add");
-        String text = bundle.getString("post");
-        String imagename = bundle.getString("imagename");
-        lat = bundle.getDouble("lat");
-        lng = bundle.getDouble("long");
-        String classification = bundle.getString("classification");
-        TextView tv_add = (TextView)findViewById(R.id.tv_openadd);
-        TextView tv_post = (TextView)findViewById(R.id.tv_opentext);
-        ImageView iv_image = (ImageView)findViewById(R.id.iv_openimage);
-        ImageView iv_icon = (ImageView)findViewById(R.id.iv_openicon);
-        tv_add.setText(address);
-        tv_post.setText(text);
-        Flare f = new Flare();
-        if(imagename.equals("")){
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            lp.topMargin = 30;
-            iv_image.setLayoutParams(lp);
+
+        LoadingTextView tv_add = (LoadingTextView) findViewById(R.id.tv_openadd);
+        tv_add.startLoading();
+        LoadingTextView  tv_post = (LoadingTextView) findViewById(R.id.tv_opentext);
+        tv_post.startLoading();
+        final LoadingImageView iv_image = (LoadingImageView) findViewById(R.id.iv_openimage);
+        iv_image.startLoading();
+        LoadingImageView iv_icon = (LoadingImageView) findViewById(R.id.iv_openicon);
+        iv_icon.startLoading();
+
+        String add = "", text1="";
+        flare = (Flare) getIntent().getSerializableExtra("flare");
+        if(flare== null) {
         }
         else {
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            lp.topMargin = 50;
-            iv_image.setLayoutParams(lp);
-            iv_image.setImageBitmap(f.loadImageFromStorage("/data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir/", imagename + ".jpg"));
-        }
-        Log.d("class", classification);
-        if(classification.equals("light")){
-            iv_icon.setImageResource(this.getResources().getIdentifier("cat1", "mipmap", this.getPackageName()));
-        }
-        else if(classification.equals("mid")){
-            iv_icon.setImageResource(this.getResources().getIdentifier("cat2", "mipmap", this.getPackageName()));
-        }
-        else{
-            iv_icon.setImageResource(this.getResources().getIdentifier("cat3", "mipmap", this.getPackageName()));
-        }
-        //tv_add.setOnClickListener(new onClickopenFrag(bundle.getLong("lat"), bundle.getLong("long"), this));
-        tv_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(openFlare.this,MapActivity.class);
-                intent.putExtra("lat",lat);
-                intent.putExtra("long",lng);
-                startActivity(intent);
+            try {
+                add = flare.getAddress();
+                text1 = flare.getflareText();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        });
-    }
+            tv_add.setText(add);
+            tv_add.stopLoading();
+            tv_post.setText(text1);
+            tv_post.stopLoading();
 
+            mStorageRef = FirebaseStorage.getInstance().getReference();
+
+            StorageReference imagesRef = mStorageRef.child(flare.getImagename());
+            imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Log.i("firebase success img",uri.getPath());
+                    Glide.with(getApplication()).load(uri).centerCrop().crossFade().into(iv_image);
+                    iv_image.stopLoading();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    Log.i("firebase error img ",exception.getMessage());
+                }
+            });
+            Log.d("class", flare.getClassification());
+            if (flare.getType().equals("light")) {
+                iv_icon.setImageResource(this.getResources().getIdentifier("cat1", "mipmap", this.getPackageName()));
+            } else if (flare.getType().equals("mid")) {
+                iv_icon.setImageResource(this.getResources().getIdentifier("cat2", "mipmap", this.getPackageName()));
+            } else {
+                iv_icon.setImageResource(this.getResources().getIdentifier("cat3", "mipmap", this.getPackageName()));
+            }
+            iv_icon.stopLoading();
+            //tv_add.setOnClickListener(new onClickopenFrag(bundle.getLong("lat"), bundle.getLong("long"), this));
+            tv_add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(openFlare.this, MapActivity.class);
+                    intent.putExtra("lat", flare.getLatitude());
+                    intent.putExtra("long", flare.getLongtitude());
+                    startActivity(intent);
+                }
+            });
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
+        }
+    }
+    @Override
+    public void onMapReady(GoogleMap map) {
+        System.out.println(flare.getLatitude()+":"+flare.getLongtitude());
+        LatLng latlngofFlare = new LatLng(flare.getLatitude(), flare.getLongtitude());
+        map.addMarker(new MarkerOptions()
+                .position(latlngofFlare)
+                .title(flare.getflareText()));
+
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latlngofFlare,18));
+
+    }
     @Override
     public void onBackPressed() {
         super.onBackPressed();
