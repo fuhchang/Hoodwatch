@@ -1,7 +1,43 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/map"
-    tools:context="com.example.hoodwatch.hoodwatch.MapActivity"
-    android:name="com.google.android.gms.maps.SupportMapFragment" />
+    android:layout_height="match_parent">
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        >
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_height="60dp"
+            android:layout_width="match_parent"
+            android:background="@android:color/white"
+            app:subtitleTextColor="#000080"
+            app:subtitle="@string/app_name"
+            app:subtitleTextAppearance="@style/ToolbarSubtitleAppearance">
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/map"
+        tools:context="com.example.hoodwatch.hoodwatch.MapActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment" />
+    <io.github.yuweiguocn.lib.squareloading.SquareLoading
+        android:id="@+id/SquareLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000080"
+        app:squareColor="@android:color/white"
+        app:squareSize="12dp"
+        app:squareCorner="2dp"
+        app:dividerSize="2dp"
+        app:xCount="4"
+        app:yCount="3"
+        />
+    </LinearLayout>
+

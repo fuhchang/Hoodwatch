@@ -24,7 +24,7 @@ public class SplashScreen extends AwesomeSplash {
         //Customize Logo
         configSplash.setLogoSplash(R.mipmap.icon2); //or any other drawable
         configSplash.setAnimLogoSplashDuration(1000); //int ms
-        configSplash.setAnimLogoSplashTechnique(Techniques.DropOut); //choose one form Techniques (ref: https://github.com/daimajia/AndroidViewAnimations)
+        configSplash.setAnimLogoSplashTechnique(Techniques.Bounce); //choose one form Techniques (ref: https://github.com/daimajia/AndroidViewAnimations)
 
 
         //Customize Path

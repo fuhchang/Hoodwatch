@@ -49,7 +49,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
         <activity android:name=".CreateFlareType" />
         <activity android:name=".CreateFlareMain" />
         <activity android:name=".openFlare" />
@@ -70,7 +70,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LocationSelectionActivity"></activity>
+        <activity android:name=".LocationSelectionActivity" />
+        <activity android:name=".ViewFlare"></activity>
     </application>
 
 </manifest>

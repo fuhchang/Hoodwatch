@@ -82,7 +82,7 @@ public class openFlare extends AppCompatActivity implements OnMapReadyCallback {
                     Log.i("firebase error img ",exception.getMessage());
                 }
             });
-            Log.d("class", flare.getClassification());
+
             if (flare.getType().equals("light")) {
                 iv_icon.setImageResource(this.getResources().getIdentifier("cat1", "mipmap", this.getPackageName()));
             } else if (flare.getType().equals("mid")) {

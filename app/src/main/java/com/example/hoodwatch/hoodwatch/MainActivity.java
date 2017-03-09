@@ -87,9 +87,6 @@ public class MainActivity extends Activity {
     ArrayList<Flare> allFlares = new ArrayList<>();
     private flareAdapter adapter;
     private RecyclerView rv;
-    LinearLayout ll;
-    int maxcount=0;
-    String path = "data/user/0/com.example.hoodwatch.hoodwatch/app_imageDir";
     FloatingActionButton myFab ;
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     @Override

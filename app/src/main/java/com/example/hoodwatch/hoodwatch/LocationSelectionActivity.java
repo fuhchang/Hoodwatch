@@ -52,18 +52,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import io.github.yuweiguocn.lib.squareloading.SquareLoading;
+
 import static com.example.hoodwatch.hoodwatch.R.mipmap.flare;
 
 public class LocationSelectionActivity extends FragmentActivity implements OnMapReadyCallback {
-    LatLng myLoc;
-    GoogleMap mMap;
-    double lat;
-    double lng;
-    String imgName;
+
     Uri imageUri;
     Marker marker;
     Circle circle;
     Flare flare;
+    SquareLoading sl;
     private DatabaseReference mDatabase;
     private StorageReference mStorageRef;
     @Override
@@ -76,7 +75,8 @@ public class LocationSelectionActivity extends FragmentActivity implements OnMap
             imageUri = (Uri) bundle.get("imageUri");
             Log.d("img path", imageUri.toString());
         }
-
+        sl = (SquareLoading) findViewById(R.id.SquareLoading);
+        sl.setVisibility(View.GONE);
         mDatabase = FirebaseDatabase.getInstance().getReference().push();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -87,7 +87,7 @@ public class LocationSelectionActivity extends FragmentActivity implements OnMap
     public void onMapReady(final GoogleMap googleMap) {
         new PanterDialog(this)
                 .setHeaderBackground(R.color.colorPrimary)
-                .setHeaderLogo(R.mipmap.ic_launcher)
+                .setHeaderLogo(R.mipmap.icon1)
                 .setPositive("I GOT IT")// You can pass also View.OnClickListener as second param
                 .setMessage("Click on the map to set Hazard point")
                 .isCancelable(false)
@@ -117,20 +117,21 @@ public class LocationSelectionActivity extends FragmentActivity implements OnMap
                     e.printStackTrace();
                 }
                                 new PanterDialog(LocationSelectionActivity.this)
-                                        .setHeaderBackground(R.color.colorPrimary)
-                                        .setHeaderLogo(R.mipmap.ic_launcher)
+                                        .setHeaderBackground(R.color.colorGrey)
+                                        .setHeaderLogo(R.mipmap.icon1)
                                         .setPositive("YES", new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
                                                 new PanterDialog(LocationSelectionActivity.this)
-                                                        .setHeaderBackground(R.color.colorPrimary)
-                                                        .setHeaderLogo(R.mipmap.ic_launcher)
+                                                        .setHeaderBackground(R.color.colorGrey)
+                                                        .setHeaderLogo(R.mipmap.icon1)
                                                         .setDialogType(DialogType.SINGLECHOICE)
                                                         .isCancelable(false).withAnimation(Animation.POP)
 
                                                         .items(R.array.choices, new OnSingleCallbackConfirmListener() {
                                                             @Override
                                                             public void onSingleCallbackConfirmed(PanterDialog dialog, int pos, String text) {
+                                                                sl.setVisibility(View.VISIBLE);
                                                                 if(text.contains("Not Dangerous")){
                                                                     flare.setType("light");
                                                                 }else if(text.contains("Mildly Dangerous")){
