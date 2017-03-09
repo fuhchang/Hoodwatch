@@ -17,6 +17,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.eminayar.panter.DialogType;
@@ -126,14 +127,15 @@ public class LocationSelectionActivity extends FragmentActivity implements OnMap
                                                         .setHeaderLogo(R.mipmap.ic_launcher)
                                                         .setDialogType(DialogType.SINGLECHOICE)
                                                         .isCancelable(false).withAnimation(Animation.POP)
+
                                                         .items(R.array.choices, new OnSingleCallbackConfirmListener() {
                                                             @Override
                                                             public void onSingleCallbackConfirmed(PanterDialog dialog, int pos, String text) {
-                                                                if(text.equals("hazard level 1")){
+                                                                if(text.contains("Not Dangerous")){
                                                                     flare.setType("light");
-                                                                }else if(text.equals("hazard level 2")){
+                                                                }else if(text.contains("Mildly Dangerous")){
                                                                     flare.setType("mid");
-                                                                }else if(text.equals("hazard level 3")){
+                                                                }else if(text.contains("Highly Dangerous")){
                                                                     flare.setType("heavy");
                                                                 }
                                                                 mDatabase.setValue(flare);

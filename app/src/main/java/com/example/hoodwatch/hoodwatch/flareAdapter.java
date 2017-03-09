@@ -13,12 +13,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.eminayar.panter.PanterDialog;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
 import java.util.ArrayList;
 import java.util.List;
 import test.jinesh.loadingviews.LoadingImageView;
@@ -32,10 +39,11 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
     private List<Flare> allFlares = new ArrayList<>();
     private Context mContext;
     private StorageReference mStorageRef;
+    private DatabaseReference mDatabase;
     private Flare flare1;
     public class MyViewHolder extends RecyclerView.ViewHolder{
-        public LoadingImageView iv;
-        public LoadingTextView tv_add, tv_hide;
+        public LoadingImageView iv, tv_hide;
+        public LoadingTextView tv_add;
         public LoadingTextView tv;
         public LoadingImageView  iv_icon;
         public CardView cv;
@@ -54,7 +62,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             iv_icon = (LoadingImageView) itemView.findViewById(R.id.iv_icon);
             iv_icon.startLoading();
             tv_distance = (LoadingTextView) itemView.findViewById(R.id.tv_Distance);
-            tv_hide = (LoadingTextView) itemView.findViewById(R.id.tv_hide);
+            tv_hide = (LoadingImageView) itemView.findViewById(R.id.tv_hide);
             cv.setCardBackgroundColor(Color.WHITE);
         }
     }
@@ -71,7 +79,6 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         final Flare f = allFlares.get(position);
-        flare1 = f;
         try {
             holder.tv.setText(f.getflareText());
             holder.tv.stopLoading();
@@ -85,7 +92,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         holder.tv_add.stopLoading();
         holder.tv_distance.setText(Double.toString(f.getFlareDistance())+" metres");
         mStorageRef = FirebaseStorage.getInstance().getReference();
-
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         StorageReference imagesRef = mStorageRef.child(f.getImagename());
         imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -122,6 +129,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
 
                 f.setHideFrom(f.getUserName());
                 pd.dismiss();
+                mDatabase.child(f.getFlareID()).child("hideFrom").setValue(f.getHideFrom());
             }
         })// You can pass also View.OnClickListener as second param
                 .setNegative("DISMISS")

@@ -67,11 +67,11 @@ public class openFlare extends AppCompatActivity implements OnMapReadyCallback {
 
             mStorageRef = FirebaseStorage.getInstance().getReference();
 
-            StorageReference imagesRef = mStorageRef.child(flare.getImagename() + ".jpg");
+            StorageReference imagesRef = mStorageRef.child(flare.getImagename());
             imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                    Log.i("firebase success img", uri.getPath());
+                    Log.i("firebase success img",uri.getPath());
                     Glide.with(getApplication()).load(uri).centerCrop().crossFade().into(iv_image);
                     iv_image.stopLoading();
                 }
@@ -79,7 +79,7 @@ public class openFlare extends AppCompatActivity implements OnMapReadyCallback {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
                     // Handle any errors
-                    Log.i("firebase error img ", exception.getMessage());
+                    Log.i("firebase error img ",exception.getMessage());
                 }
             });
             Log.d("class", flare.getClassification());
@@ -113,7 +113,7 @@ public class openFlare extends AppCompatActivity implements OnMapReadyCallback {
                 .position(latlngofFlare)
                 .title(flare.getflareText()));
 
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latlngofFlare,15));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latlngofFlare,18));
 
     }
     @Override
