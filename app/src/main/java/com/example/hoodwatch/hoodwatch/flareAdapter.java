@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -35,12 +37,13 @@ import test.jinesh.loadingviews.LoadingTextView;
 
 
 public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder> {
-
+    public flareAdapter thisAdapter = this;
     private List<Flare> allFlares = new ArrayList<>();
     private Context mContext;
     private StorageReference mStorageRef;
     private DatabaseReference mDatabase;
     private Flare flare1;
+    private int lastPosition = -1;
     public class MyViewHolder extends RecyclerView.ViewHolder{
         public LoadingImageView iv, tv_hide;
         public LoadingTextView tv_add;
@@ -70,6 +73,16 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         this.mContext = mContext;
         this.allFlares = allFlares;
     }
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
+    }
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_layout, parent, false);
@@ -77,13 +90,14 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, final int position) {
         final Flare f = allFlares.get(position);
         try {
             holder.tv.setText(f.getflareText());
             holder.tv.stopLoading();
             holder.tv.setTextSize(30);
             holder.tv.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
+            setAnimation(holder.itemView, position);
         }
         catch (Exception e){
             holder.tv.setText("");
@@ -126,10 +140,10 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         pd.setPositive("Yes", new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-
                 f.setHideFrom(f.getUserName());
                 pd.dismiss();
                 mDatabase.child(f.getFlareID()).child("hideFrom").setValue(f.getHideFrom());
+                thisAdapter.notifyItemRemoved(position);
             }
         })// You can pass also View.OnClickListener as second param
                 .setNegative("DISMISS")

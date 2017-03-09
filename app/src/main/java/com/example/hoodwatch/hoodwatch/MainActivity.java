@@ -20,10 +20,14 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -104,6 +108,24 @@ public class MainActivity extends Activity {
         rv.setLayoutManager(mLayoutManager);
         rv.setItemAnimator(new DefaultItemAnimator());
         rv.setAdapter(adapter);
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallBack = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                System.out.println(viewHolder.getAdapterPosition());
+                listofFlares.get(viewHolder.getAdapterPosition()).setHideFrom("norman");
+                mPostReference.child(listofFlares.get(viewHolder.getAdapterPosition()).getFlareID()).child("hideFrom").setValue(listofFlares.get(viewHolder.getAdapterPosition()).getHideFrom());
+                changelist();
+                //adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                adapter.notifyDataSetChanged();
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallBack);
+        itemTouchHelper.attachToRecyclerView(rv);
         final SwipeRefreshLayout swipeRefresh = (SwipeRefreshLayout)findViewById(R.id.swipeRefreshLayout);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
             @Override
@@ -135,7 +157,6 @@ public class MainActivity extends Activity {
         }
 
         geoList.clear();
-
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -175,8 +196,6 @@ public class MainActivity extends Activity {
                                     maxSize = (int)child.getChildrenCount();
 //                                    for(DataSnapshot children: child.getChildren()){
                                         Flare flare = child.getValue(Flare.class);
-
-
                                         allFlares.add(flare);
                                         geoList.add(new Geofence.Builder()
                                                 .setRequestId(flare.getFlareID())
@@ -285,14 +304,14 @@ public class MainActivity extends Activity {
                                                 });
                                             }
                                             changelist();
+                                            //adapter.notifyDataSetChanged();
                                             if(sl.VISIBLE != View.GONE){
                                                 sl.setVisibility(View.GONE);
                                             }
-                                            adapter.notifyDataSetChanged();
+
                                         }
                                     }
                                 }
-                                adapter.notifyDataSetChanged();
 
                             }
 
@@ -360,6 +379,7 @@ public class MainActivity extends Activity {
                     listofFlares.add(flare);
                 }
             }
+            adapter.notifyItemInserted(0);
         }
     }
 
