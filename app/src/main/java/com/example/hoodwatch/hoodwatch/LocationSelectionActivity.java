@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.eminayar.panter.DialogType;
@@ -63,6 +64,7 @@ public class LocationSelectionActivity extends FragmentActivity implements OnMap
     Circle circle;
     Flare flare;
     SquareLoading sl;
+    ImageView thumb;
     private DatabaseReference mDatabase;
     private StorageReference mStorageRef;
     @Override
@@ -75,12 +77,13 @@ public class LocationSelectionActivity extends FragmentActivity implements OnMap
             imageUri = (Uri) bundle.get("imageUri");
             Log.d("img path", imageUri.toString());
         }
-        sl = (SquareLoading) findViewById(R.id.SquareLoading);
-        sl.setVisibility(View.GONE);
+
+
         mDatabase = FirebaseDatabase.getInstance().getReference().push();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        thumb = (ImageView) findViewById(R.id.thumb);
     }
 
     @Override
@@ -116,65 +119,58 @@ public class LocationSelectionActivity extends FragmentActivity implements OnMap
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                                new PanterDialog(LocationSelectionActivity.this)
-                                        .setHeaderBackground(R.color.colorGrey)
-                                        .setHeaderLogo(R.mipmap.icon1)
-                                        .setPositive("YES", new View.OnClickListener() {
+                thumb.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        new PanterDialog(LocationSelectionActivity.this)
+                                .setHeaderBackground(R.color.colorGrey)
+                                .setHeaderLogo(R.mipmap.icon1)
+                                .setDialogType(DialogType.SINGLECHOICE)
+                                .isCancelable(false).withAnimation(Animation.POP)
+
+                                .items(R.array.choices, new OnSingleCallbackConfirmListener() {
+                                    @Override
+                                    public void onSingleCallbackConfirmed(PanterDialog dialog, int pos, String text) {
+                                        sl = (SquareLoading) findViewById(R.id.SquareLoading);
+                                        if(text.contains("Not Dangerous")){
+                                            flare.setType("light");
+                                        }else if(text.contains("Mildly Dangerous")){
+                                            flare.setType("mid");
+                                        }else if(text.contains("Highly Dangerous")){
+                                            flare.setType("heavy");
+                                        }
+                                        mDatabase.setValue(flare);
+                                        flare.setImagename(mDatabase.getKey()+".jpg");
+                                        flare.setFlareID(mDatabase.getKey());
+                                        mDatabase.setValue(flare);
+                                        StorageReference imgRef = mStorageRef.child(flare.getImagename());
+                                        UploadTask uploadTask = imgRef.putFile(imageUri);
+                                        uploadTask.addOnFailureListener(new OnFailureListener() {
                                             @Override
-                                            public void onClick(View view) {
-                                                new PanterDialog(LocationSelectionActivity.this)
-                                                        .setHeaderBackground(R.color.colorGrey)
-                                                        .setHeaderLogo(R.mipmap.icon1)
-                                                        .setDialogType(DialogType.SINGLECHOICE)
-                                                        .isCancelable(false).withAnimation(Animation.POP)
-
-                                                        .items(R.array.choices, new OnSingleCallbackConfirmListener() {
-                                                            @Override
-                                                            public void onSingleCallbackConfirmed(PanterDialog dialog, int pos, String text) {
-                                                                sl.setVisibility(View.VISIBLE);
-                                                                if(text.contains("Not Dangerous")){
-                                                                    flare.setType("light");
-                                                                }else if(text.contains("Mildly Dangerous")){
-                                                                    flare.setType("mid");
-                                                                }else if(text.contains("Highly Dangerous")){
-                                                                    flare.setType("heavy");
-                                                                }
-                                                                mDatabase.setValue(flare);
-                                                                flare.setImagename(mDatabase.getKey()+".jpg");
-                                                                flare.setFlareID(mDatabase.getKey());
-                                                                mDatabase.setValue(flare);
-                                                                StorageReference imgRef = mStorageRef.child(flare.getImagename());
-                                                                UploadTask uploadTask = imgRef.putFile(imageUri);
-                                                                uploadTask.addOnFailureListener(new OnFailureListener() {
-                                                                    @Override
-                                                                    public void onFailure(@NonNull Exception e) {
-                                                                        Toast.makeText(getApplicationContext(),"failed",Toast.LENGTH_LONG).show();
-                                                                    }
-                                                                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                                                    @Override
-                                                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                                        Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_LONG).show();
-                                                                        Intent intent = new Intent(LocationSelectionActivity.this, MainActivity.class);
-                                                                        startActivity(intent);
-                                                                        sl.setVisibility(View.GONE);
-                                                                        finish();
-                                                                    }
-                                                                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                                                                    @Override
-                                                                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-
-                                                                    }
-                                                                });
-
-                                                            }
-                                                        })
-                                                        .show();
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(getApplicationContext(),"failed",Toast.LENGTH_LONG).show();
                                             }
-                                        })// You can pass also View.OnClickListener as second param
-                                        .setNegative("NO")
-                                        .setMessage("Set hazard Location?")
-                                        .isCancelable(false).withAnimation(Animation.POP)
-                                        .show();
+                                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_LONG).show();
+                                                Intent intent = new Intent(LocationSelectionActivity.this, MainActivity.class);
+                                                startActivity(intent);
+                                                sl.setVisibility(View.GONE);
+                                                finish();
+                                            }
+                                        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+
+                                            }
+                                        });
+
+                                    }
+                                })
+                                .show();
+                    }
+                });
 
                             }
                         });

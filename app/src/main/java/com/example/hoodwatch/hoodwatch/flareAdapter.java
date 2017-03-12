@@ -65,7 +65,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
             iv_icon = (LoadingImageView) itemView.findViewById(R.id.iv_icon);
             iv_icon.startLoading();
             tv_distance = (LoadingTextView) itemView.findViewById(R.id.tv_Distance);
-            tv_hide = (LoadingImageView) itemView.findViewById(R.id.tv_hide);
+//            tv_hide = (LoadingImageView) itemView.findViewById(R.id.tv_hide);
             cv.setCardBackgroundColor(Color.WHITE);
         }
     }
@@ -149,12 +149,12 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
                 .setNegative("DISMISS")
                 .setMessage("Do you want to hide this flare?")
                 .isCancelable(false);
-        holder.tv_hide.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pd.show();
-            }
-        });
+//        holder.tv_hide.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                pd.show();
+//            }
+//        });
 
 
     }
