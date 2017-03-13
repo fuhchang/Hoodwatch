@@ -2,7 +2,7 @@ package com.example.hoodwatch.hoodwatch;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -10,11 +10,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Flare implements Serializable {
     private String flareID;
     private String imagename;
-
+    private ArrayList<String> hideArray;
     public double getFlareDistance() {
         return flareDistance;
     }
@@ -39,7 +42,7 @@ public class Flare implements Serializable {
     private String hideFrom;
     private long time;
     private String type;
-    private Uri uri;
+    private URI uri;
     public Flare(){
         flareID = "";
         imagename = "";
@@ -50,14 +53,23 @@ public class Flare implements Serializable {
         longtitude = 0.0;
         time = 0L;
         hideFrom = "";
+        hideArray = new ArrayList<>();
     }
 
 
-    public Uri getUri() {
+    public void setHideName(String name){
+        hideArray.add(name);
+    }
+
+    public ArrayList<String> getHideArray() {
+        return hideArray;
+    }
+
+    public URI getUri() {
         return uri;
     }
 
-    public void setUri(Uri uri) {
+    public void setUri(URI uri) {
         this.uri = uri;
     }
 

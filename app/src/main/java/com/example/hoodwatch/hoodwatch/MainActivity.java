@@ -11,6 +11,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -54,6 +55,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.math.RoundingMode;
+import java.net.URI;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -119,7 +121,9 @@ public class MainActivity extends Activity {
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 System.out.println(viewHolder.getAdapterPosition());
                 listofFlares.get(viewHolder.getAdapterPosition()).setHideFrom("norman");
-                mPostReference.child(listofFlares.get(viewHolder.getAdapterPosition()).getFlareID()).child("hideFrom").setValue(listofFlares.get(viewHolder.getAdapterPosition()).getHideFrom());
+                Flare flare = listofFlares.get(viewHolder.getAdapterPosition());
+                mPostReference.child(flare.getFlareID()).child("hideFrom").push().setValue("norman");
+//                mPostReference.child(listofFlares.get(viewHolder.getAdapterPosition()).getFlareID()).child("hideFrom").setValue(listofFlares.get(viewHolder.getAdapterPosition()).getHideFrom());
                 changelist();
                 //adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
                 adapter.notifyDataSetChanged();
@@ -196,7 +200,21 @@ public class MainActivity extends Activity {
                                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                                     maxSize = (int)child.getChildrenCount();
 //                                    for(DataSnapshot children: child.getChildren()){
-                                        Flare flare = child.getValue(Flare.class);
+                                        Flare flare = new Flare();
+                                        flare.setFlareID(child.getKey());
+                                        flare.setflareText(child.child("flareText").getValue().toString());
+                                        flare.setImagename(child.child("imagename").getValue().toString());
+                                        flare.setAddress(child.child("address").getValue().toString());
+                                        flare.setTime((Long) child.child("time").getValue());
+                                        flare.setType(child.child("type").getValue().toString());
+                                        flare.setLatitude((Double) child.child("latitude").getValue());
+                                        flare.setLongtitude((Double) child.child("longtitude").getValue());
+                                        flare.setUserName(child.child("userName").toString());
+                                        for(DataSnapshot children : child.child("hideFrom").getChildren()){
+                                                Log.d("hide",children.getValue().toString());
+                                                flare.setHideName(children.getValue().toString());
+                                       }
+
                                         allFlares.add(flare);
                                         geoList.add(new Geofence.Builder()
                                                 .setRequestId(flare.getFlareID())
@@ -362,6 +380,9 @@ public class MainActivity extends Activity {
     private void changelist(){
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             startLocationMonitoring();
+            if(listofFlares.size() > 0){
+                listofFlares.clear();
+            }
             double longitude = location.getLongitude();
             double latitude = location.getLatitude();
             Location locationA = new Location("point A");
