@@ -177,7 +177,6 @@ class myOwnClickListener implements View.OnClickListener
     @Override
     public void onClick(View v)
     {
-
         Intent intent = new Intent(mContext, ViewFlare.class);
         intent.putExtra("flare",f);
         mContext.startActivity(intent);

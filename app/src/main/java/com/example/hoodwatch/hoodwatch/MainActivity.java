@@ -55,7 +55,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.math.RoundingMode;
-import java.net.URI;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -119,13 +118,13 @@ public class MainActivity extends Activity {
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                System.out.println(viewHolder.getAdapterPosition());
+                System.out.println(viewHolder.getAdapterPosition()+" : " + adapter.getItemCount());
                 listofFlares.get(viewHolder.getAdapterPosition()).setHideFrom("norman");
                 Flare flare = listofFlares.get(viewHolder.getAdapterPosition());
                 mPostReference.child(flare.getFlareID()).child("hideFrom").push().setValue("norman");
 //                mPostReference.child(listofFlares.get(viewHolder.getAdapterPosition()).getFlareID()).child("hideFrom").setValue(listofFlares.get(viewHolder.getAdapterPosition()).getHideFrom());
                 changelist();
-                //adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+
                 adapter.notifyDataSetChanged();
             }
         };
@@ -209,7 +208,7 @@ public class MainActivity extends Activity {
                                         flare.setType(child.child("type").getValue().toString());
                                         flare.setLatitude((Double) child.child("latitude").getValue());
                                         flare.setLongtitude((Double) child.child("longtitude").getValue());
-                                        flare.setUserName(child.child("userName").toString());
+                                        flare.setUserName(child.child("userName").getValue().toString());
                                         for(DataSnapshot children : child.child("hideFrom").getChildren()){
                                                 Log.d("hide",children.getValue().toString());
                                                 flare.setHideName(children.getValue().toString());
@@ -240,7 +239,6 @@ public class MainActivity extends Activity {
                                         //adapter.notifyDataSetChanged();
                                         Intent intent = new Intent(MainActivity.this,CreateFlareMain.class);
                                         intent.putExtra("username","norman");
-                                        intent.putExtra("maxcount", maxSize);
                                         intent.putExtra("map", allFlares);
                                         startActivity(intent);
                                         finish();
@@ -323,7 +321,7 @@ public class MainActivity extends Activity {
                                                 });
                                             }
                                             changelist();
-                                            //adapter.notifyDataSetChanged();
+                                            adapter.notifyDataSetChanged();
                                             if(sl.VISIBLE != View.GONE){
                                                 sl.setVisibility(View.GONE);
                                             }
@@ -393,13 +391,14 @@ public class MainActivity extends Activity {
                 locationB.setLatitude(flare.getLatitude());
                 locationB.setLongitude(flare.getLongtitude());
                 double distance = location.distanceTo(locationB);
-                System.out.println(flare.getFlareID());
-                if (distance < 5000 && !flare.getHideFrom().contains(flare.getUserName())) {
+                if (distance < 5000 && !flare.getHideArray().contains(flare.getUserName())) {
                     DecimalFormat df = new DecimalFormat("#.#");
                     df.setRoundingMode(RoundingMode.CEILING);
                     flare.setFlareDistance(Double.parseDouble(df.format(distance)));
                     listofFlares.add(flare);
+
                 }
+
             }
             adapter.notifyItemInserted(0);
         }

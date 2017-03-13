@@ -161,12 +161,6 @@ public class Flare implements Serializable {
     }
 
     public void setHideFrom(String hideFrom) {
-        if(this.hideFrom != null){
-            this.hideFrom = this.hideFrom + "," + hideFrom;
-        }
-        else{
             this.hideFrom = hideFrom;
-        }
-
     }
 }
