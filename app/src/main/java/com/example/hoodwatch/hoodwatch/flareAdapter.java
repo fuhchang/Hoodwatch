@@ -102,18 +102,18 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         catch (Exception e){
             holder.tv.setText("");
         }
-
         holder.tv_add.setText(f.getAddress());
         holder.tv_add.stopLoading();
         holder.tv_distance.setText(Double.toString(f.getFlareDistance())+" metres");
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        System.out.println(f.getImagename());
+        if(f.getImagename() != null){
             StorageReference imagesRef = mStorageRef.child(f.getImagename());
             imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
                     Log.i("firebase success img",uri.getPath());
-
                     Glide.with(mContext).load(uri).centerCrop().crossFade().into(holder.iv);
                     holder.iv.stopLoading();
                 }
@@ -124,6 +124,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
                     Log.i("firebase error img ",exception.getMessage());
                 }
             });
+        }
 
 
         

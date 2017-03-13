@@ -44,7 +44,7 @@ public class GeofenceService extends IntentService {
             String requestID = geofence.getRequestId();
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.icon2);
             NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(this).setSmallIcon(R.mipmap.icon1).setLargeIcon(bitmap)
+                    new NotificationCompat.Builder(this).setSmallIcon(R.mipmap.ic_launcher).setLargeIcon(bitmap)
                             .setContentTitle("Hazard notification");
             if(transition == Geofence.GEOFENCE_TRANSITION_ENTER){
                 mBuilder.setContentText("Becareful!!! There is a hazard Near you");
