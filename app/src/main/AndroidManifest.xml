@@ -49,10 +49,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".MainActivity" />
-        <activity android:name=".CreateFlareType" />
-        <activity android:name=".CreateFlareMain" />
-        <activity android:name=".openFlare" />
+        <activity android:name=".MainActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".CreateFlareType" android:screenOrientation="portrait"/>
+        <activity android:name=".CreateFlareMain" android:screenOrientation="portrait"/>
+        <activity android:name=".openFlare" android:screenOrientation="portrait"/>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -61,17 +61,21 @@
         <activity
             android:name=".MapFragment"
             android:label="@string/title_activity_map_fragment"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".MapActivity" />
-        <activity android:name=".SplashScreen">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MapActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SplashScreen"
+            android:screenOrientation="portrait">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LocationSelectionActivity" />
-        <activity android:name=".ViewFlare"></activity>
+        <activity android:name=".LocationSelectionActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".ViewFlare" android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>
