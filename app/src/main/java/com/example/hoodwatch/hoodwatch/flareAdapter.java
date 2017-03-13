@@ -108,7 +108,7 @@ public class flareAdapter extends RecyclerView.Adapter<flareAdapter.MyViewHolder
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         System.out.println(f.getImagename());
-        if(f.getImagename() != null){
+        if(f.getImagename() != null && !f.getImagename().equals("")){
             StorageReference imagesRef = mStorageRef.child(f.getImagename());
             imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
