@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
@@ -40,9 +42,9 @@ public class GeofenceService extends IntentService {
             List<Geofence> geoList = event.getTriggeringGeofences();
             Geofence geofence = geoList.get(0);
             String requestID = geofence.getRequestId();
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.icon2);
             NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(this)
-                            .setSmallIcon(R.mipmap.ic_launcher)
+                    new NotificationCompat.Builder(this).setSmallIcon(R.mipmap.icon1).setLargeIcon(bitmap)
                             .setContentTitle("Hazard notification");
             if(transition == Geofence.GEOFENCE_TRANSITION_ENTER){
                 mBuilder.setContentText("Becareful!!! There is a hazard Near you");
